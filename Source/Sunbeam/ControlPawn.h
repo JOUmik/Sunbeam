@@ -24,6 +24,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float _X = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float _Y = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool UseHardware = false;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -34,12 +41,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting")
 	UInputMappingContext* MappingContext;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "CPPSettings|CatchBlueprintFunction")
+	void BPReadDate();
+
+
 private:
 	//Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RotateAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	class UInputAction* SwitchAction;
+
 	void Rotate(const FInputActionValue& Value);
+	void Switch();
+
+	UFUNCTION(BlueprintCallable)
+	void RotateHardware();
 
 	class ADirectionalLight* SunLight;
+
+	FTimerHandle RotateTimeHandle;
+
 };

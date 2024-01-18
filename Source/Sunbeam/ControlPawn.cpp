@@ -18,6 +18,8 @@ AControlPawn::AControlPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
+
 }
 
 // Called when the game starts or when spawned
@@ -33,6 +35,9 @@ void AControlPawn::BeginPlay()
 
 	UClass* DirectionalLightClass = ADirectionalLight::StaticClass();
 	SunLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(GetWorld(), DirectionalLightClass));
+
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.2f, true);
+
 }
 
 // Called every frame
@@ -50,6 +55,7 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (InputComp) {
 		InputComp->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AControlPawn::Rotate);
+		InputComp->BindAction(SwitchAction, ETriggerEvent::Started, this, &AControlPawn::Switch);
 	}
 }
 
@@ -78,4 +84,39 @@ void AControlPawn::Rotate(const FInputActionValue& Value) {
 
 		SunLight->SetActorRotation(rotator);
 	}
+}
+
+void AControlPawn::RotateHardware() {
+	if (_X > 1.f) return;
+	
+	
+	if (SunLight) {
+		//Calculate the Angle
+		FVector2D Base(0, -1);
+		double Yaw = FMath::Atan2(_Y, _X) - FMath::Atan2(Base.Y, Base.X);
+		Yaw = FMath::RadiansToDegrees(Yaw);
+		if (Yaw <= 0) Yaw = FMath::Abs(Yaw);
+		//else if (Yaw <= 90) Yaw = 360.0f - Yaw;
+		else Yaw = 360.0f - Yaw;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
+
+		//Calculate thr Height Of Sun. (SunHeight == 0: Highest, SunHeight == 1: Lowest)
+		double SunHeight = FMath::Sqrt(FMath::Square(_X) + FMath::Square(_Y));
+		SunHeight = FMath::Min(SunHeight, 1.0f);
+		double YRotation;
+		//if (Input.Y >= 0) 
+		YRotation = 270 + SunHeight * 90;
+		//else YRotation = 270 + SunHeight * 90;
+		FRotator rotator(YRotation, Yaw, 0);
+
+		SunLight->SetActorRotation(rotator);
+	}
+	
+	
+}
+
+void AControlPawn::Switch(){
+	UseHardware = !UseHardware;
+	if (UseHardware) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control open")));
+	else GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control close")));
 }
