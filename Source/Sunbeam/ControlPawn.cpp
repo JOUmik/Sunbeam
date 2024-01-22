@@ -82,7 +82,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 			YRotation = 270 + SunHeight * 90;
 		//else YRotation = 270 + SunHeight * 90;
 		FRotator rotator(YRotation, Yaw, 0);
-
+		
 		SunLight->SetActorRotation(rotator);
 	}
 }
@@ -123,6 +123,13 @@ void AControlPawn::RotateWithHardware_Gyro() {
 
 	FRotator CurRotation = SunLight->GetActorRotation();
 	CurRotation.Yaw = _Yaw;
+
+	float Pitch = CurRotation.Pitch;
+
+	if (_Pitch > 90.f) {
+		Pitch = 270 + FMath::Abs(_Pitch - 90.f);
+	}
+	CurRotation.Pitch = Pitch;
 	SunLight->SetActorRotation(CurRotation);
 }
 
