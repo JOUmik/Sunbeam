@@ -27,9 +27,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float _X = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _Y = 0;
+	float _Y = 0; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float _Pitch = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float _Yaw = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float _Roll = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseHardware = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SelectedHardware = 0;         //0:JoyCon, 1:Gyro
 
 public:	
 	// Called every frame
@@ -48,16 +56,21 @@ public:
 private:
 	//Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
-	class UInputAction* RotateAction;
+	UInputAction* RotateAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
-	class UInputAction* SwitchAction;
+	UInputAction* SwitchAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* HardwareSelectAction;
 
-	void Rotate(const FInputActionValue& Value);
+	void RotateWithEnhancedInput(const FInputActionValue& Value);
 	void Switch();
+	void HardwareSelect(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
-	void RotateHardware();
+	void RotateWithHardware_JoyCon();
+	UFUNCTION(BlueprintCallable)
+	void RotateWithHardware_Gyro();
 
 	class ADirectionalLight* SunLight;
 

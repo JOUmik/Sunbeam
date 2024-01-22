@@ -54,14 +54,15 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	UEnhancedInputComponent* InputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (InputComp) {
-		InputComp->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AControlPawn::Rotate);
+		InputComp->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AControlPawn::RotateWithEnhancedInput);
 		InputComp->BindAction(SwitchAction, ETriggerEvent::Started, this, &AControlPawn::Switch);
+		InputComp->BindAction(HardwareSelectAction, ETriggerEvent::Started, this, &AControlPawn::HardwareSelect);
 	}
 }
 
-void AControlPawn::Rotate(const FInputActionValue& Value) {
+void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 	FVector2D Input = Value.Get<FVector2D>();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), Input.X, Input.Y));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), Input.X, Input.Y));
 
 	if (SunLight) {
 		//Calculate the Angle
@@ -71,7 +72,7 @@ void AControlPawn::Rotate(const FInputActionValue& Value) {
 		if (Yaw <= 0) Yaw = FMath::Abs(Yaw);
 		//else if (Yaw <= 90) Yaw = 360.0f - Yaw;
 		else Yaw = 360.0f - Yaw;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
 
 		//Calculate thr Height Of Sun. (SunHeight == 0: Highest, SunHeight == 1: Lowest)
 		double SunHeight = FMath::Sqrt(FMath::Square(Input.X) + FMath::Square(Input.Y));
@@ -86,7 +87,8 @@ void AControlPawn::Rotate(const FInputActionValue& Value) {
 	}
 }
 
-void AControlPawn::RotateHardware() {
+void AControlPawn::RotateWithHardware_JoyCon() {
+	//if _X > 1.f, it means can no get input from hardware
 	if (_X > 1.f) return;
 	
 	
@@ -115,8 +117,31 @@ void AControlPawn::RotateHardware() {
 	
 }
 
+void AControlPawn::RotateWithHardware_Gyro() {
+	//if _Yaw < -500.f, it means can no get input from hardware
+	if (_Yaw < -500.f) return;
+
+	FRotator CurRotation = SunLight->GetActorRotation();
+	CurRotation.Yaw = _Yaw;
+	SunLight->SetActorRotation(CurRotation);
+}
+
 void AControlPawn::Switch(){
 	UseHardware = !UseHardware;
 	if (UseHardware) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control open")));
 	else GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control close")));
+}
+
+void AControlPawn::HardwareSelect(const FInputActionValue& Value) {
+	float Input = Value.Get<float>();
+
+	int32 Input_int = FMath::RoundToInt32(Input);
+
+	SelectedHardware = Input_int;
+	if (Input_int == 1) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("Use JoyCon Hardware")));
+	}
+	else if (Input_int == 2) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("Use Gyro Hardware")));
+	}
 }
