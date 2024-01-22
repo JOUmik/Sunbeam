@@ -36,7 +36,7 @@ void AControlPawn::BeginPlay()
 	UClass* DirectionalLightClass = ADirectionalLight::StaticClass();
 	SunLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(GetWorld(), DirectionalLightClass));
 
-	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.2f, true);
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.1f, true);
 
 }
 

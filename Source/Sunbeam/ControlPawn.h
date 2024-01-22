@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseHardware = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SelectedHardware = 0;         //0:JoyCon, 1:Gyro
+	int32 SelectedHardware = 2;         //0:JoyCon, 1:Gyro
 
 public:	
 	// Called every frame
