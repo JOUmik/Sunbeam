@@ -47,7 +47,7 @@ void AControlPawn::BeginPlay()
 	MoonLight->SetEnabled(false);
 	Lights.Emplace(MoonLight);
 
-	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.1f, true);
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
 
 }
 
@@ -76,7 +76,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 	FVector2D Input = Value.Get<FVector2D>();
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), Input.X, Input.Y));
 
-	if (SunLight) {
+	if (ControledLight) {
 		//Calculate the Angle
 		FVector2D Base(0, -1);
 		double Yaw = FMath::Atan2(Input.Y, Input.X) - FMath::Atan2(Base.Y, Base.X);
@@ -95,7 +95,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 		//else YRotation = 270 + SunHeight * 90;
 		FRotator rotator(YRotation, Yaw, 0);
 		
-		SunLight->SetActorRotation(rotator);
+		ControledLight->SetActorRotation(rotator);
 	}
 }
 
@@ -104,7 +104,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 	if (_X > 1.f) return;
 	
 	
-	if (SunLight) {
+	if (ControledLight) {
 		//Calculate the Angle
 		FVector2D Base(0, -1);
 		double Yaw = FMath::Atan2(_Y, _X) - FMath::Atan2(Base.Y, Base.X);
@@ -123,7 +123,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 		//else YRotation = 270 + SunHeight * 90;
 		FRotator rotator(YRotation, Yaw, 0);
 
-		SunLight->SetActorRotation(rotator);
+		ControledLight->SetActorRotation(rotator);
 	}
 	
 	
