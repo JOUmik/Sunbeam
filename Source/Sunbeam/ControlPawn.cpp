@@ -34,7 +34,17 @@ void AControlPawn::BeginPlay()
 	}
 
 	UClass* DirectionalLightClass = ADirectionalLight::StaticClass();
-	SunLight = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(GetWorld(), DirectionalLightClass));
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("SunLight"), OutActors);
+	SunLight = Cast<ADirectionalLight>(OutActors[0]);
+	Lights.Emplace(SunLight);
+
+	OutActors.Empty();
+
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("MoonLight"), OutActors);
+	MoonLight = Cast<ADirectionalLight>(OutActors[0]);
+	MoonLight->SetEnabled(false);
+	Lights.Emplace(MoonLight);
 
 	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.1f, true);
 
@@ -57,6 +67,7 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		InputComp->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AControlPawn::RotateWithEnhancedInput);
 		InputComp->BindAction(SwitchAction, ETriggerEvent::Started, this, &AControlPawn::Switch);
 		InputComp->BindAction(HardwareSelectAction, ETriggerEvent::Started, this, &AControlPawn::HardwareSelect);
+		InputComp->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &AControlPawn::ChangeLightWithEnhancedInput);
 	}
 }
 
@@ -150,5 +161,33 @@ void AControlPawn::HardwareSelect(const FInputActionValue& Value) {
 	}
 	else if (Input_int == 2) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("Use Gyro Hardware")));
+	}
+}
+
+void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) {
+	float Input = Value.Get<float>();
+	int32 Input_int = FMath::RoundToInt32(Input);
+	if (EnabledLightIndex + 1 == Input_int) return;
+	for (int i = 0; i < Lights.Num(); i++) {
+		if (i + 1 == Input_int) {
+			EnabledLightIndex = i;
+			Lights[i]->SetEnabled(true);
+		}
+		else {
+			Lights[i]->SetEnabled(false);
+		}
+	}
+}
+
+void AControlPawn::ChangeLightWithHardware(int index){
+	if (EnabledLightIndex == index) return;
+	for (int i = 0; i < Lights.Num(); i++) {
+		if (i == index) {
+			EnabledLightIndex = i;
+			Lights[i]->SetEnabled(true);
+		}
+		else {
+			Lights[i]->SetEnabled(false);
+		}
 	}
 }

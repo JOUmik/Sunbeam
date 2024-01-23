@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseHardware = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SelectedHardware = 2;         //0:JoyCon, 1:Gyro
+	int32 SelectedHardware = 1;         //1:JoyCon, 2:Gyro
 
 public:	
 	// Called every frame
@@ -62,17 +62,28 @@ private:
 	UInputAction* SwitchAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* HardwareSelectAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ChangeLightAction;
 
 	void RotateWithEnhancedInput(const FInputActionValue& Value);
 	void Switch();
 	void HardwareSelect(const FInputActionValue& Value);
+	void ChangeLightWithEnhancedInput(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
 	void RotateWithHardware_JoyCon();
 	UFUNCTION(BlueprintCallable)
 	void RotateWithHardware_Gyro();
+	UFUNCTION(BlueprintCallable)
+	void ChangeLightWithHardware(int index);
 
 	class ADirectionalLight* SunLight;
+	ADirectionalLight* MoonLight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TArray<ADirectionalLight*> Lights;
+
+	int EnabledLightIndex = 0;
 
 	FTimerHandle RotateTimeHandle;
 
