@@ -38,6 +38,7 @@ void AControlPawn::BeginPlay()
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("SunLight"), OutActors);
 	SunLight = Cast<ADirectionalLight>(OutActors[0]);
 	Lights.Emplace(SunLight);
+	ControledLight = SunLight;
 
 	OutActors.Empty();
 
@@ -137,8 +138,8 @@ void AControlPawn::RotateWithHardware_Gyro() {
 
 	float Pitch = CurRotation.Pitch;
 
-	if (_Pitch > 90.f) {
-		Pitch = 270 + FMath::Abs(_Pitch - 90.f);
+	if (_Pitch > 0.f && _Pitch < 90.f) {
+		Pitch = 270 + (90.f - _Pitch);
 	}
 	CurRotation.Pitch = Pitch;
 	SunLight->SetActorRotation(CurRotation);
@@ -171,6 +172,7 @@ void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) 
 	for (int i = 0; i < Lights.Num(); i++) {
 		if (i + 1 == Input_int) {
 			EnabledLightIndex = i;
+			ControledLight = Lights[i];
 			Lights[i]->SetEnabled(true);
 		}
 		else {
@@ -184,6 +186,7 @@ void AControlPawn::ChangeLightWithHardware(int index){
 	for (int i = 0; i < Lights.Num(); i++) {
 		if (i == index) {
 			EnabledLightIndex = i;
+			ControledLight = Lights[i];
 			Lights[i]->SetEnabled(true);
 		}
 		else {
