@@ -137,8 +137,8 @@ void AControlPawn::RotateWithHardware_Gyro() {
 
 	float Pitch = CurRotation.Pitch;
 
-	if (_Pitch > 90.f) {
-		Pitch = 270 + FMath::Abs(_Pitch - 90.f);
+	if (_Pitch > 0.f && _Pitch < 90.f) {
+		Pitch = 270 + (90.f - _Pitch);
 	}
 	CurRotation.Pitch = Pitch;
 	SunLight->SetActorRotation(CurRotation);
