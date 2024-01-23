@@ -79,6 +79,7 @@ private:
 
 	class ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
+	ADirectionalLight* ControledLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<ADirectionalLight*> Lights;
