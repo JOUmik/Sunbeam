@@ -88,4 +88,9 @@ private:
 
 	FTimerHandle RotateTimeHandle;
 
+	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
+	double LerpRate = 1.f;
+
+	FRotator r;
+	FRotator CurRotator, TargetRotator;
 };

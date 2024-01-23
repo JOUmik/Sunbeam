@@ -8,6 +8,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -56,6 +57,8 @@ void AControlPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//ControledLight->SetActorRotation(r);
+	
 }
 
 // Called to bind functionality to input
@@ -93,8 +96,10 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 		//if (Input.Y >= 0) 
 			YRotation = 270 + SunHeight * 90;
 		//else YRotation = 270 + SunHeight * 90;
+		//FRotator CurRotator = ControledLight->GetActorRotation();
 		FRotator rotator(YRotation, Yaw, 0);
 		
+		//r =  FQuat::Slerp(CurRotator.Quaternion(), rotator.Quaternion(), LerpRate).Rotator();
 		ControledLight->SetActorRotation(rotator);
 	}
 }
@@ -133,7 +138,7 @@ void AControlPawn::RotateWithHardware_Gyro() {
 	//if _Yaw < -500.f, it means can no get input from hardware
 	if (_Yaw < -500.f) return;
 
-	FRotator CurRotation = SunLight->GetActorRotation();
+	FRotator CurRotation = ControledLight->GetActorRotation();
 	CurRotation.Yaw = _Yaw;
 
 	float Pitch = CurRotation.Pitch;
@@ -142,7 +147,7 @@ void AControlPawn::RotateWithHardware_Gyro() {
 		Pitch = 270 + (90.f - _Pitch);
 	}
 	CurRotation.Pitch = Pitch;
-	SunLight->SetActorRotation(CurRotation);
+	ControledLight->SetActorRotation(CurRotation);
 }
 
 void AControlPawn::Switch(){
