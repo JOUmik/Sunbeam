@@ -48,7 +48,6 @@ void AControlPawn::BeginPlay()
 	MoonLight->SetEnabled(false);
 	Lights.Emplace(MoonLight);
 
-	//GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.01f, true);
 
 }
 
@@ -57,7 +56,6 @@ void AControlPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	BPReadDate();
-	//ControledLight->SetActorRotation(r);
 	
 }
 
@@ -141,14 +139,18 @@ void AControlPawn::RotateWithHardware_Gyro() {
 	if (_Yaw < -500.f) return;
 
 	FRotator CurRotation = ControledLight->GetActorRotation();
+	CurRotation.Pitch = _Pitch;
 	CurRotation.Yaw = _Yaw;
-
+	CurRotation.Roll = _Roll;
+	/*
 	float Pitch = CurRotation.Pitch;
 
 	if (_Pitch > 0.f && _Pitch < 90.f) {
 		Pitch = 270 + (90.f - _Pitch);
 	}
 	CurRotation.Pitch = Pitch;
+	*/
+	
 	ControledLight->SetActorRotation(CurRotation);
 }
 
