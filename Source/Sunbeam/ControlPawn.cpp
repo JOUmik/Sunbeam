@@ -48,7 +48,7 @@ void AControlPawn::BeginPlay()
 	MoonLight->SetEnabled(false);
 	Lights.Emplace(MoonLight);
 
-	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
+	//GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.01f, true);
 
 }
 
@@ -56,7 +56,7 @@ void AControlPawn::BeginPlay()
 void AControlPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	BPReadDate();
 	//ControledLight->SetActorRotation(r);
 	
 }
@@ -135,6 +135,8 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 }
 
 void AControlPawn::RotateWithHardware_Gyro() {
+
+
 	//if _Yaw < -500.f, it means can no get input from hardware
 	if (_Yaw < -500.f) return;
 
