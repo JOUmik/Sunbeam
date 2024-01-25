@@ -8,7 +8,6 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -98,7 +97,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 		FRotator rotator(YRotation, Yaw, 0);
 		
 		//r =  FQuat::Slerp(CurRotator.Quaternion(), rotator.Quaternion(), LerpRate).Rotator();
-		ControledLight->SetActorRotation(rotator);
+		ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), rotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 	}
 }
 
@@ -126,7 +125,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 		//else YRotation = 270 + SunHeight * 90;
 		FRotator rotator(YRotation, Yaw, 0);
 
-		ControledLight->SetActorRotation(rotator);
+		ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), rotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 	}
 	
 	
@@ -151,7 +150,7 @@ void AControlPawn::RotateWithHardware_Gyro() {
 	CurRotation.Pitch = Pitch;
 	*/
 	
-	ControledLight->SetActorRotation(CurRotation);
+	ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), CurRotation, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 }
 
 void AControlPawn::Switch(){
