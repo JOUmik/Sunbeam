@@ -69,6 +69,8 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		InputComp->BindAction(SwitchAction, ETriggerEvent::Started, this, &AControlPawn::Switch);
 		InputComp->BindAction(HardwareSelectAction, ETriggerEvent::Started, this, &AControlPawn::HardwareSelect);
 		InputComp->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &AControlPawn::ChangeLightWithEnhancedInput);
+		InputComp->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMapWithEnhancedInput);
+		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMirrorWithEnhancedInput);
 	}
 }
 
@@ -189,6 +191,20 @@ void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) 
 	}
 }
 
+void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
+{
+	float Input = Value.Get<float>();
+	int32 Input_int = FMath::RoundToInt32(Input);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), Input_int));
+}
+
+void AControlPawn::ChangeMirrorWithEnhancedInput(const FInputActionValue& Value)
+{
+	float Input = Value.Get<float>();
+	int32 Input_int = FMath::RoundToInt32(Input);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), Input_int));
+}
+
 void AControlPawn::ChangeLightWithHardware(int index){
 	if (EnabledLightIndex == index) return;
 	for (int i = 0; i < Lights.Num(); i++) {
@@ -201,4 +217,14 @@ void AControlPawn::ChangeLightWithHardware(int index){
 			Lights[i]->SetActorHiddenInGame(true);
 		}
 	}
+}
+
+void AControlPawn::ChangeMapWithHardware(int index)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), index));
+}
+
+void AControlPawn::ChangeMirrorWithHardware(int index)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), index));
 }
