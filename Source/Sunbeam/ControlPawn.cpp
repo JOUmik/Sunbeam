@@ -44,7 +44,7 @@ void AControlPawn::BeginPlay()
 
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("MoonLight"), OutActors);
 	MoonLight = Cast<ADirectionalLight>(OutActors[0]);
-	MoonLight->SetEnabled(false);
+	MoonLight->SetActorHiddenInGame(true);
 	Lights.Emplace(MoonLight);
 
 
@@ -181,10 +181,10 @@ void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) 
 		if (i + 1 == Input_int) {
 			EnabledLightIndex = i;
 			ControledLight = Lights[i];
-			Lights[i]->SetEnabled(true);
+			Lights[i]->SetActorHiddenInGame(false);
 		}
 		else {
-			Lights[i]->SetEnabled(false);
+			Lights[i]->SetActorHiddenInGame(true);
 		}
 	}
 }
@@ -195,10 +195,10 @@ void AControlPawn::ChangeLightWithHardware(int index){
 		if (i == index) {
 			EnabledLightIndex = i;
 			ControledLight = Lights[i];
-			Lights[i]->SetEnabled(true);
+			Lights[i]->SetActorHiddenInGame(false);
 		}
 		else {
-			Lights[i]->SetEnabled(false);
+			Lights[i]->SetActorHiddenInGame(true);
 		}
 	}
 }
