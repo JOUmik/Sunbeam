@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float _Roll = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool UseHardware = false;
+	bool UseHardware = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SelectedHardware = 1;         //1:JoyCon, 2:Gyro
 
