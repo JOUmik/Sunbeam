@@ -17,5 +17,6 @@ class SUNBEAM_API USunbeamGameInstance : public UPlatformGameInstance
 public:
 	void ChangeMap(int index);
 
+	UPROPERTY(BlueprintReadOnly)
 	int CurrentMapIndex = 0;
 };

@@ -36,6 +36,7 @@ void AControlPawn::BeginPlay()
 
 	LightsInitialize();
 	ItemsInitialize();
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
 
 }
 
@@ -105,7 +106,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 		if (Yaw <= 0) Yaw = FMath::Abs(Yaw);
 		//else if (Yaw <= 90) Yaw = 360.0f - Yaw;
 		else Yaw = 360.0f - Yaw;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
 
 		//Calculate thr Height Of Sun. (SunHeight == 0: Highest, SunHeight == 1: Lowest)
 		double SunHeight = FMath::Sqrt(FMath::Square(_X) + FMath::Square(_Y));
@@ -229,8 +230,8 @@ void AControlPawn::LightsInitialize()
 void AControlPawn::ItemsInitialize()
 {
 	//UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("Focal"), Focals);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("DayItem"), DayItems);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("NightItem"), NightItems);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("DayItem"), DayItems);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("NightItem"), NightItems);
 
 	/*for(int i = 0; i<Focals.Num(); i++)
 	{
@@ -252,12 +253,12 @@ void AControlPawn::ChangeLight(int index)
 		ControledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(false);
 		MoonLight->SetActorHiddenInGame(true);
-		for(int i = 0; i<DayItems.Num(); i++){
+		/*for(int i = 0; i<DayItems.Num(); i++){
 			DayItems[i]->SetActorHiddenInGame(false);
 		}
 		for(int i = 0; i<NightItems.Num(); i++){
 			NightItems[i]->SetActorHiddenInGame(true);
-		}
+		}*/
 	}
 	//Enable MoonLight and NightItems
 	else
