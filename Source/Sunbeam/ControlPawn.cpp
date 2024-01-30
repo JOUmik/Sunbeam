@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "SunbeamGameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
@@ -167,7 +168,7 @@ void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
 	float Input = Value.Get<float>();
 	int32 Input_int = FMath::RoundToInt32(Input);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), Input_int));
-	ChangeMap(Input_int);
+	ChangeMap(Input_int-1);
 }
 
 void AControlPawn::ShowMirrorWithEnhancedInput(const FInputActionValue& Value)
@@ -276,4 +277,8 @@ void AControlPawn::ChangeLight(int index)
 
 void AControlPawn::ChangeMap(int index)
 {
+	if(UGameInstance* GameIns = GetGameInstance())
+	{
+		Cast<USunbeamGameInstance>(GameIns)->ChangeMap(index);
+	}
 }
