@@ -230,8 +230,8 @@ void AControlPawn::LightsInitialize()
 void AControlPawn::ItemsInitialize()
 {
 	//UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("Focal"), Focals);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("DayItem"), DayItems);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("NightItem"), NightItems);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("DayItem"), DayItems);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("NightItem"), NightItems);
 
 	/*for(int i = 0; i<Focals.Num(); i++)
 	{
@@ -253,12 +253,12 @@ void AControlPawn::ChangeLight(int index)
 		ControledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(false);
 		MoonLight->SetActorHiddenInGame(true);
-		for(int i = 0; i<DayItems.Num(); i++){
+		/*for(int i = 0; i<DayItems.Num(); i++){
 			DayItems[i]->SetActorHiddenInGame(false);
 		}
 		for(int i = 0; i<NightItems.Num(); i++){
 			NightItems[i]->SetActorHiddenInGame(true);
-		}
+		}*/
 	}
 	//Enable MoonLight and NightItems
 	else
