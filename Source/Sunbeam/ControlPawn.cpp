@@ -106,7 +106,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 		if (Yaw <= 0) Yaw = FMath::Abs(Yaw);
 		//else if (Yaw <= 90) Yaw = 360.0f - Yaw;
 		else Yaw = 360.0f - Yaw;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: %f"), Yaw));
 
 		//Calculate thr Height Of Sun. (SunHeight == 0: Highest, SunHeight == 1: Lowest)
 		double SunHeight = FMath::Sqrt(FMath::Square(_X) + FMath::Square(_Y));
