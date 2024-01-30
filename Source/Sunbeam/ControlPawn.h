@@ -91,6 +91,9 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
 
+	void ChangeMap(int index);
+	void ChangeMirror(int index);
+	
 	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
 
@@ -104,7 +107,7 @@ private:
 	FTimerHandle RotateTimeHandle;
 
 	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
-	double LerpRate = 1.f;
+	double LerpRate = 10.f;
 
 	FRotator r;
 	FRotator CurRotator, TargetRotator;
