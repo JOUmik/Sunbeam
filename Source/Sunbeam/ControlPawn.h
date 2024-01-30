@@ -91,14 +91,19 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
 
+	void LightsInitialize();
+	void FocalsInitialize();
+	
 	void ChangeMap(int index);
-	void ChangeMirror(int index);
+	void ChangeMirror();
 	
 	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<ADirectionalLight*> Lights;
+
+	TArray<AActor*> Focals;
 
 	int EnabledLightIndex = 0;
 	int MapIndex = 0;
@@ -109,6 +114,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
 	double LerpRate = 10.f;
 
-	FRotator r;
 	FRotator CurRotator, TargetRotator;
 };
