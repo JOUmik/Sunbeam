@@ -8,7 +8,6 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/DirectionalLight.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -40,15 +39,15 @@ void AControlPawn::BeginPlay()
 	SunLight = Cast<ADirectionalLight>(OutActors[0]);
 	Lights.Emplace(SunLight);
 	ControledLight = SunLight;
+	TargetRotator = ControledLight->GetActorRotation();
 
 	OutActors.Empty();
 
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("MoonLight"), OutActors);
 	MoonLight = Cast<ADirectionalLight>(OutActors[0]);
-	MoonLight->SetEnabled(false);
+	MoonLight->SetActorHiddenInGame(true);
 	Lights.Emplace(MoonLight);
 
-	//GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.01f, true);
 
 }
 
@@ -57,8 +56,8 @@ void AControlPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	BPReadDate();
-	//ControledLight->SetActorRotation(r);
-	
+
+	ControledLight->SetActorRotation(FMath::RInterpTo(ControledLight->GetActorRotation(), TargetRotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 }
 
 // Called to bind functionality to input
@@ -72,6 +71,8 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		InputComp->BindAction(SwitchAction, ETriggerEvent::Started, this, &AControlPawn::Switch);
 		InputComp->BindAction(HardwareSelectAction, ETriggerEvent::Started, this, &AControlPawn::HardwareSelect);
 		InputComp->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &AControlPawn::ChangeLightWithEnhancedInput);
+		InputComp->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMapWithEnhancedInput);
+		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMirrorWithEnhancedInput);
 	}
 }
 
@@ -98,9 +99,10 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 		//else YRotation = 270 + SunHeight * 90;
 		//FRotator CurRotator = ControledLight->GetActorRotation();
 		FRotator rotator(YRotation, Yaw, 0);
-		
+		TargetRotator = rotator;
 		//r =  FQuat::Slerp(CurRotator.Quaternion(), rotator.Quaternion(), LerpRate).Rotator();
-		ControledLight->SetActorRotation(rotator);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Rotate Angle: Yaw: %f, Pitch: %f"), rotator.Yaw, rotator.Pitch));
+		//ControledLight->SetActorRotation(rotator);
 	}
 }
 
@@ -127,8 +129,8 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 		YRotation = 270 + SunHeight * 90;
 		//else YRotation = 270 + SunHeight * 90;
 		FRotator rotator(YRotation, Yaw, 0);
-
-		ControledLight->SetActorRotation(rotator);
+		TargetRotator = rotator;
+		//ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), rotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 	}
 	
 	
@@ -141,15 +143,19 @@ void AControlPawn::RotateWithHardware_Gyro() {
 	if (_Yaw < -500.f) return;
 
 	FRotator CurRotation = ControledLight->GetActorRotation();
+	CurRotation.Pitch = _Pitch;
 	CurRotation.Yaw = _Yaw;
-
+	CurRotation.Roll = _Roll;
+	/*
 	float Pitch = CurRotation.Pitch;
 
 	if (_Pitch > 0.f && _Pitch < 90.f) {
 		Pitch = 270 + (90.f - _Pitch);
 	}
 	CurRotation.Pitch = Pitch;
-	ControledLight->SetActorRotation(CurRotation);
+	*/
+	
+	ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), CurRotation, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 }
 
 void AControlPawn::Switch(){
@@ -180,12 +186,27 @@ void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) 
 		if (i + 1 == Input_int) {
 			EnabledLightIndex = i;
 			ControledLight = Lights[i];
-			Lights[i]->SetEnabled(true);
+			Lights[i]->SetActorHiddenInGame(false);
 		}
 		else {
-			Lights[i]->SetEnabled(false);
+			Lights[i]->SetActorHiddenInGame(true);
 		}
 	}
+}
+
+void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
+{
+	float Input = Value.Get<float>();
+	int32 Input_int = FMath::RoundToInt32(Input);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), Input_int));
+	ChangeMap(Input_int);
+}
+
+void AControlPawn::ChangeMirrorWithEnhancedInput(const FInputActionValue& Value)
+{
+	float Input = Value.Get<float>();
+	int32 Input_int = FMath::RoundToInt32(Input);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), Input_int));
 }
 
 void AControlPawn::ChangeLightWithHardware(int index){
@@ -194,10 +215,30 @@ void AControlPawn::ChangeLightWithHardware(int index){
 		if (i == index) {
 			EnabledLightIndex = i;
 			ControledLight = Lights[i];
-			Lights[i]->SetEnabled(true);
+			Lights[i]->SetActorHiddenInGame(false);
 		}
 		else {
-			Lights[i]->SetEnabled(false);
+			Lights[i]->SetActorHiddenInGame(true);
 		}
 	}
+}
+
+void AControlPawn::ChangeMapWithHardware(int index)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), index));
+	ChangeMap(index);
+}
+
+void AControlPawn::ChangeMirrorWithHardware(int index)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), index));
+	ChangeMirror(index);
+}
+
+void AControlPawn::ChangeMap(int index)
+{
+}
+
+void AControlPawn::ChangeMirror(int index)
+{
 }

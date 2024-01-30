@@ -10,6 +10,8 @@ class UInputMappingContext;
 class UInputComponent;
 class UInputAction;
 struct FInputActionValue;
+class ADirectionalLight;
+
 
 UCLASS()
 class SUNBEAM_API AControlPawn : public APawn
@@ -52,6 +54,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "CPPSettings|CatchBlueprintFunction")
 	void BPReadDate();
 
+	UPROPERTY(BlueprintReadOnly)
+	ADirectionalLight* ControledLight;
 
 private:
 	//Input Action
@@ -64,11 +68,17 @@ private:
 	UInputAction* HardwareSelectAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ChangeLightAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ChangeMapAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ChangeMirrorAction;
 
 	void RotateWithEnhancedInput(const FInputActionValue& Value);
 	void Switch();
 	void HardwareSelect(const FInputActionValue& Value);
 	void ChangeLightWithEnhancedInput(const FInputActionValue& Value);
+	void ChangeMapWithEnhancedInput(const FInputActionValue& Value);
+	void ChangeMirrorWithEnhancedInput(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
 	void RotateWithHardware_JoyCon();
@@ -76,20 +86,28 @@ private:
 	void RotateWithHardware_Gyro();
 	UFUNCTION(BlueprintCallable)
 	void ChangeLightWithHardware(int index);
+	UFUNCTION(BlueprintCallable)
+	void ChangeMapWithHardware(int index);
+	UFUNCTION(BlueprintCallable)
+	void ChangeMirrorWithHardware(int index);
 
-	class ADirectionalLight* SunLight;
+	void ChangeMap(int index);
+	void ChangeMirror(int index);
+	
+	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
-	ADirectionalLight* ControledLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<ADirectionalLight*> Lights;
 
 	int EnabledLightIndex = 0;
+	int MapIndex = 0;
+	int MirrorIndex = 0;
 
 	FTimerHandle RotateTimeHandle;
 
 	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
-	double LerpRate = 1.f;
+	double LerpRate = 10.f;
 
 	FRotator r;
 	FRotator CurRotator, TargetRotator;
