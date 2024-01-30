@@ -10,6 +10,8 @@ class UInputMappingContext;
 class UInputComponent;
 class UInputAction;
 struct FInputActionValue;
+class ADirectionalLight;
+
 
 UCLASS()
 class SUNBEAM_API AControlPawn : public APawn
@@ -52,6 +54,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "CPPSettings|CatchBlueprintFunction")
 	void BPReadDate();
 
+	UPROPERTY(BlueprintReadOnly)
+	ADirectionalLight* ControledLight;
 
 private:
 	//Input Action
@@ -87,9 +91,8 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
 
-	class ADirectionalLight* SunLight;
+	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
-	ADirectionalLight* ControledLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<ADirectionalLight*> Lights;
