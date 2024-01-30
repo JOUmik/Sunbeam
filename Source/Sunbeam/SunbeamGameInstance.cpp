@@ -17,7 +17,7 @@ void USunbeamGameInstance::ChangeMap(int index)
 		else
 		{
 			CurrentMapIndex = 1;
-			UGameplayStatics::OpenLevel(GetWorld(), TEXT("Map_Debug"));
+			UGameplayStatics::OpenLevel(GetWorld(), TEXT("Map_Level_2"));
 		}
 	}
 }
