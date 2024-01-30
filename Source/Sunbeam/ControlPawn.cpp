@@ -34,7 +34,7 @@ void AControlPawn::BeginPlay()
 	}
 
 	LightsInitialize();
-	FocalsInitialize();
+	ItemsInitialize();
 
 }
 
@@ -157,18 +157,9 @@ void AControlPawn::HardwareSelect(const FInputActionValue& Value) {
 
 void AControlPawn::ChangeLightWithEnhancedInput(const FInputActionValue& Value) {
 	float Input = Value.Get<float>();
-	int32 Input_int = FMath::RoundToInt32(Input);
-	if (EnabledLightIndex + 1 == Input_int) return;
-	for (int i = 0; i < Lights.Num(); i++) {
-		if (i + 1 == Input_int) {
-			EnabledLightIndex = i;
-			ControledLight = Lights[i];
-			Lights[i]->SetActorHiddenInGame(false);
-		}
-		else {
-			Lights[i]->SetActorHiddenInGame(true);
-		}
-	}
+	int32 Input_int = FMath::RoundToInt32(Input)-1;
+	if (EnabledLightIndex == Input_int) return;
+	ChangeLight(Input_int);
 }
 
 void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
@@ -190,16 +181,7 @@ void AControlPawn::ChangeMirrorWithEnhancedInput(const FInputActionValue& Value)
 
 void AControlPawn::ChangeLightWithHardware(int index){
 	if (EnabledLightIndex == index) return;
-	for (int i = 0; i < Lights.Num(); i++) {
-		if (i == index) {
-			EnabledLightIndex = i;
-			ControledLight = Lights[i];
-			Lights[i]->SetActorHiddenInGame(false);
-		}
-		else {
-			Lights[i]->SetActorHiddenInGame(true);
-		}
-	}
+	ChangeLight(index);
 }
 
 void AControlPawn::ChangeMapWithHardware(int index)
@@ -234,15 +216,52 @@ void AControlPawn::LightsInitialize()
 	Lights.Emplace(MoonLight);
 }
 
-void AControlPawn::FocalsInitialize()
+void AControlPawn::ItemsInitialize()
 {
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("Focal"), Focals);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("DayItem"), DayItems);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("NightItem"), NightItems);
 
 	for(int i = 0; i<Focals.Num(); i++)
 	{
 		Focals[i]->SetActorHiddenInGame(true);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Num of Focals: %d"), Focals.Num()));
+
+	for(int i = 0; i<NightItems.Num(); i++){
+		NightItems[i]->SetActorHiddenInGame(true);
+	}
+}
+
+void AControlPawn::ChangeLight(int index)
+{
+	//Enable SunLight and DayItems
+	if(index == 0)
+	{
+		EnabledLightIndex = 0;
+		ControledLight = Lights[index];
+		SunLight->SetActorHiddenInGame(false);
+		MoonLight->SetActorHiddenInGame(true);
+		for(int i = 0; i<DayItems.Num(); i++){
+			DayItems[i]->SetActorHiddenInGame(false);
+		}
+		for(int i = 0; i<NightItems.Num(); i++){
+			NightItems[i]->SetActorHiddenInGame(true);
+		}
+	}
+	//Enable MoonLight and NightItems
+	else
+	{
+		EnabledLightIndex = 1;
+		ControledLight = Lights[index];
+		SunLight->SetActorHiddenInGame(true);
+		MoonLight->SetActorHiddenInGame(false);
+		for(int i = 0; i<DayItems.Num(); i++){
+			DayItems[i]->SetActorHiddenInGame(true);
+		}
+		for(int i = 0; i<NightItems.Num(); i++){
+			NightItems[i]->SetActorHiddenInGame(false);
+		}
+	}
 }
 
 void AControlPawn::ChangeMap(int index)
@@ -251,6 +270,9 @@ void AControlPawn::ChangeMap(int index)
 
 void AControlPawn::ChangeMirror()
 {
+	//if using NightLight, do not show focal
+	if(EnabledLightIndex == 1) return;
+	
 	for(int i = 0; i<Focals.Num(); i++)
 	{
 		Focals[i]->SetActorHiddenInGame(!Focals[i]->IsHidden());

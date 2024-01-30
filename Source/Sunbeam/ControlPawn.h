@@ -92,8 +92,9 @@ private:
 	void ChangeMirrorWithHardware(int index);
 
 	void LightsInitialize();
-	void FocalsInitialize();
-	
+	void ItemsInitialize();
+
+	void ChangeLight(int index);
 	void ChangeMap(int index);
 	void ChangeMirror();
 	
@@ -104,6 +105,8 @@ private:
 	TArray<ADirectionalLight*> Lights;
 
 	TArray<AActor*> Focals;
+	TArray<AActor*> DayItems;
+	TArray<AActor*> NightItems;
 
 	int EnabledLightIndex = 0;
 	int MapIndex = 0;
