@@ -59,8 +59,8 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		InputComp->BindAction(HardwareSelectAction, ETriggerEvent::Started, this, &AControlPawn::HardwareSelect);
 		InputComp->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &AControlPawn::ChangeLightWithEnhancedInput);
 		InputComp->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMapWithEnhancedInput);
-		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMirrorWithEnhancedInput);
-		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Completed, this, &AControlPawn::ChangeMirrorWithEnhancedInput);
+		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &AControlPawn::ShowMirrorWithEnhancedInput);
+		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Completed, this, &AControlPawn::HideMirrorWithEnhancedInput);
 	}
 }
 
@@ -170,13 +170,22 @@ void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
 	ChangeMap(Input_int);
 }
 
-void AControlPawn::ChangeMirrorWithEnhancedInput(const FInputActionValue& Value)
+void AControlPawn::ShowMirrorWithEnhancedInput(const FInputActionValue& Value)
 {
+	//if using NightLight, do not show focal
+	if(EnabledLightIndex == 1) return;
 	float Input = Value.Get<float>();
 	int32 Input_int = FMath::RoundToInt32(Input) - 1;
 	MirrorIndex = Input_int;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), Input_int));
-	ChangeMirror();
+	ChangeMirror(true);
+}
+
+void AControlPawn::HideMirrorWithEnhancedInput(const FInputActionValue& Value)
+{
+	//if using NightLight, do not show focal
+	if(EnabledLightIndex == 1) return;
+	ChangeMirror(false);
 }
 
 void AControlPawn::ChangeLightWithHardware(int index){
@@ -195,7 +204,7 @@ void AControlPawn::ChangeMirrorWithHardware(int index)
 	if(MirrorIndex == index) return;
 	MirrorIndex = index;
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), index));
-	ChangeMirror();
+	ChangeMirror(index == 0?false:true);
 }
 
 void AControlPawn::LightsInitialize()
@@ -218,14 +227,15 @@ void AControlPawn::LightsInitialize()
 
 void AControlPawn::ItemsInitialize()
 {
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("Focal"), Focals);
+	//UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("Focal"), Focals);
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("DayItem"), DayItems);
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AStaticMeshActor::StaticClass(), TEXT("NightItem"), NightItems);
 
-	for(int i = 0; i<Focals.Num(); i++)
+	/*for(int i = 0; i<Focals.Num(); i++)
 	{
 		Focals[i]->SetActorHiddenInGame(true);
 	}
+	*/
 
 	for(int i = 0; i<NightItems.Num(); i++){
 		NightItems[i]->SetActorHiddenInGame(true);
@@ -266,15 +276,4 @@ void AControlPawn::ChangeLight(int index)
 
 void AControlPawn::ChangeMap(int index)
 {
-}
-
-void AControlPawn::ChangeMirror()
-{
-	//if using NightLight, do not show focal
-	if(EnabledLightIndex == 1) return;
-	
-	for(int i = 0; i<Focals.Num(); i++)
-	{
-		Focals[i]->SetActorHiddenInGame(!Focals[i]->IsHidden());
-	}
 }
