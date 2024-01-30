@@ -241,6 +241,7 @@ void AControlPawn::ItemsInitialize()
 
 	for(int i = 0; i<NightItems.Num(); i++){
 		NightItems[i]->SetActorHiddenInGame(true);
+		NightItems[i]->SetActorEnableCollision(false);
 	}
 }
 
@@ -269,9 +270,11 @@ void AControlPawn::ChangeLight(int index)
 		MoonLight->SetActorHiddenInGame(false);
 		for(int i = 0; i<DayItems.Num(); i++){
 			DayItems[i]->SetActorHiddenInGame(true);
+			DayItems[i]->SetActorEnableCollision(false);
 		}
 		for(int i = 0; i<NightItems.Num(); i++){
 			NightItems[i]->SetActorHiddenInGame(false);
+			NightItems[i]->SetActorEnableCollision(true);
 		}
 	}
 }
