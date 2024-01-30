@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeMirror(bool bShow);
 
+	UPROPERTY(BlueprintReadOnly)
+	int EnabledLightIndex = 0;
+
 private:
 	//Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
@@ -111,7 +114,6 @@ private:
 	TArray<AActor*> DayItems;
 	TArray<AActor*> NightItems;
 
-	int EnabledLightIndex = 0;
 	int MapIndex = 0;
 	int MirrorIndex = 0;
 
