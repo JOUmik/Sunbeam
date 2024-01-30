@@ -48,7 +48,7 @@ void AControlPawn::BeginPlay()
 	MoonLight->SetEnabled(false);
 	Lights.Emplace(MoonLight);
 
-	//GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.01f, true);
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
 
 }
 
