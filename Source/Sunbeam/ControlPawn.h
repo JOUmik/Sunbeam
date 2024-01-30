@@ -57,6 +57,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ADirectionalLight* ControledLight;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeMirror(bool bShow);
+
 private:
 	//Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
@@ -78,7 +81,8 @@ private:
 	void HardwareSelect(const FInputActionValue& Value);
 	void ChangeLightWithEnhancedInput(const FInputActionValue& Value);
 	void ChangeMapWithEnhancedInput(const FInputActionValue& Value);
-	void ChangeMirrorWithEnhancedInput(const FInputActionValue& Value);
+	void ShowMirrorWithEnhancedInput(const FInputActionValue& Value);
+	void HideMirrorWithEnhancedInput(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
 	void RotateWithHardware_JoyCon();
@@ -91,14 +95,21 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
 
+	void LightsInitialize();
+	void ItemsInitialize();
+
+	void ChangeLight(int index);
 	void ChangeMap(int index);
-	void ChangeMirror(int index);
 	
 	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<ADirectionalLight*> Lights;
+
+	//TArray<AActor*> Focals;
+	TArray<AActor*> DayItems;
+	TArray<AActor*> NightItems;
 
 	int EnabledLightIndex = 0;
 	int MapIndex = 0;
@@ -109,6 +120,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
 	double LerpRate = 10.f;
 
-	FRotator r;
 	FRotator CurRotator, TargetRotator;
 };

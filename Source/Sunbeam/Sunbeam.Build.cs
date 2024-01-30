@@ -8,6 +8,14 @@ public class Sunbeam : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		PublicIncludePaths.AddRange(new string[]
+		{
+			"Sunbeam"
+		});
+		PrivateIncludePaths.AddRange(new string[]
+		{
+			"Sunbeam"
+		});
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "SERIALCOM" });
 	}
 }
