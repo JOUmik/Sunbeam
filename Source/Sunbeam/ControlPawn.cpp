@@ -36,6 +36,7 @@ void AControlPawn::BeginPlay()
 
 	LightsInitialize();
 	ItemsInitialize();
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
 
 }
 
