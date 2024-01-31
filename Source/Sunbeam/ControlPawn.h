@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "ControlPawn.generated.h"
 
+class USunbeamGameInstance;
 class UInputMappingContext;
 class UInputComponent;
 class UInputAction;
@@ -59,6 +60,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeMirror(bool bShow);
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeLightBeam();
 
 	UPROPERTY(BlueprintReadOnly)
 	int EnabledLightIndex = 0;
@@ -123,4 +126,5 @@ private:
 	double LerpRate = 10.f;
 
 	FRotator CurRotator, TargetRotator;
+	USunbeamGameInstance* SunbeamGameInstance;
 };

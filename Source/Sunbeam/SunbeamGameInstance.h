@@ -19,4 +19,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	int CurrentMapIndex = 0;
+
+	bool HardwareControlEnabled = true;
 };

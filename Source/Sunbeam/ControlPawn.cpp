@@ -38,6 +38,8 @@ void AControlPawn::BeginPlay()
 	ItemsInitialize();
 	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &AControlPawn::BPReadDate, 0.09f, true);
 
+	SunbeamGameInstance = Cast<USunbeamGameInstance>(GetGameInstance());
+	if(SunbeamGameInstance) UseHardware = SunbeamGameInstance->HardwareControlEnabled;
 }
 
 // Called every frame
@@ -139,6 +141,7 @@ void AControlPawn::RotateWithHardware_Gyro() {
 
 void AControlPawn::Switch(){
 	UseHardware = !UseHardware;
+	SunbeamGameInstance->HardwareControlEnabled = UseHardware;
 	if (UseHardware) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control open")));
 	else GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control close")));
 }
@@ -168,7 +171,7 @@ void AControlPawn::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
 {
 	float Input = Value.Get<float>();
 	int32 Input_int = FMath::RoundToInt32(Input);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), Input_int));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), Input_int));
 	ChangeMap(Input_int-1);
 }
 
@@ -179,7 +182,7 @@ void AControlPawn::ShowMirrorWithEnhancedInput(const FInputActionValue& Value)
 	float Input = Value.Get<float>();
 	int32 Input_int = FMath::RoundToInt32(Input) - 1;
 	MirrorIndex = Input_int;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), Input_int));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), Input_int));
 	ChangeMirror(true);
 }
 
@@ -197,7 +200,7 @@ void AControlPawn::ChangeLightWithHardware(int index){
 
 void AControlPawn::ChangeMapWithHardware(int index)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), index));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), index));
 	ChangeMap(index);
 }
 
@@ -205,7 +208,7 @@ void AControlPawn::ChangeMirrorWithHardware(int index)
 {
 	if(MirrorIndex == index) return;
 	MirrorIndex = index;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), index));
+	GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Blue, FString::Printf(TEXT("Mirror Index: %d"), index));
 	ChangeMirror(index == 0?false:true);
 }
 
@@ -254,6 +257,8 @@ void AControlPawn::ChangeLight(int index)
 		ControledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(false);
 		MoonLight->SetActorHiddenInGame(true);
+		SunLight->SetActorRotation(MoonLight->GetActorRotation());
+		ChangeLightBeam();
 		/*for(int i = 0; i<DayItems.Num(); i++){
 			DayItems[i]->SetActorHiddenInGame(false);
 		}
@@ -268,6 +273,8 @@ void AControlPawn::ChangeLight(int index)
 		ControledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(true);
 		MoonLight->SetActorHiddenInGame(false);
+		MoonLight->SetActorRotation(SunLight->GetActorRotation());
+		ChangeLightBeam();
 		for(int i = 0; i<DayItems.Num(); i++){
 			DayItems[i]->SetActorHiddenInGame(true);
 			DayItems[i]->SetActorEnableCollision(false);
