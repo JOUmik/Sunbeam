@@ -9,9 +9,9 @@ void USunbeamGameInstance::ChangeMap(int index)
 	if(index == CurrentMapIndex) return;
 	else
 	{
-		if(index == 0)
+		if(index == 2)
 		{
-			CurrentMapIndex = 0;
+			CurrentMapIndex = 2;
 			UGameplayStatics::OpenLevel(GetWorld(), TEXT("Map_Level_1"));
 		}
 		else
