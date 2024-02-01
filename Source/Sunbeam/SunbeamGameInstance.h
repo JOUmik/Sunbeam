@@ -18,7 +18,7 @@ public:
 	void ChangeMap(int index);
 
 	UPROPERTY(BlueprintReadOnly)
-	int CurrentMapIndex = 0;
+	int CurrentMapIndex = 2;
 
 	bool HardwareControlEnabled = true;
 };
