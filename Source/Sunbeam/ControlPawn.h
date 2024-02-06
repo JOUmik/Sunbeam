@@ -56,7 +56,7 @@ public:
 	void BPReadDate();
 
 	UPROPERTY(BlueprintReadOnly)
-	ADirectionalLight* ControledLight;
+	ADirectionalLight* ControlledLight;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeMirror(bool bShow);
@@ -81,6 +81,11 @@ private:
 	UInputAction* ChangeMapAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ChangeMirrorAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* RotateWithMouseAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	float MouseSensitivity = 0.1f;
 
 	void RotateWithEnhancedInput(const FInputActionValue& Value);
 	void Switch();
@@ -89,6 +94,7 @@ private:
 	void ChangeMapWithEnhancedInput(const FInputActionValue& Value);
 	void ShowMirrorWithEnhancedInput(const FInputActionValue& Value);
 	void HideMirrorWithEnhancedInput(const FInputActionValue& Value);
+	void RotateWithMouseInput(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
 	void RotateWithHardware_JoyCon();
