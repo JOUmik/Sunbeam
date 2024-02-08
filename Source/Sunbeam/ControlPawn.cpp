@@ -48,7 +48,7 @@ void AControlPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	BPReadDate();
 
-	ControledLight->SetActorRotation(FMath::RInterpTo(ControledLight->GetActorRotation(), TargetRotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
+	ControlledLight->SetActorRotation(FMath::RInterpTo(ControlledLight->GetActorRotation(), TargetRotator, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 }
 
 // Called to bind functionality to input
@@ -65,6 +65,7 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		InputComp->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &AControlPawn::ChangeMapWithEnhancedInput);
 		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &AControlPawn::ShowMirrorWithEnhancedInput);
 		InputComp->BindAction(ChangeMirrorAction, ETriggerEvent::Completed, this, &AControlPawn::HideMirrorWithEnhancedInput);
+		InputComp->BindAction(RotateWithMouseAction, ETriggerEvent::Triggered, this, &AControlPawn::RotateWithMouseInput);
 	}
 }
 
@@ -72,7 +73,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 	FVector2D Input = Value.Get<FVector2D>();
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), Input.X, Input.Y));
 
-	if (ControledLight) {
+	if (ControlledLight) {
 		//Calculate the Angle
 		FVector2D Base(0, -1);
 		double Yaw = FMath::Atan2(Input.Y, Input.X) - FMath::Atan2(Base.Y, Base.X);
@@ -85,7 +86,7 @@ void AControlPawn::RotateWithEnhancedInput(const FInputActionValue& Value) {
 		SunHeight = FMath::Min(SunHeight, 1.0f);
 		double YRotation;
 		//if (Input.Y >= 0) 
-			YRotation = 270 + SunHeight * 90;
+		YRotation = 270 + SunHeight * 90;
 		//else YRotation = 270 + SunHeight * 90;
 		//FRotator CurRotator = ControledLight->GetActorRotation();
 		FRotator rotator(YRotation, Yaw, 0);
@@ -100,7 +101,7 @@ void AControlPawn::RotateWithHardware_JoyCon() {
 	if (_X > 1.f) return;
 	
 	
-	if (ControledLight) {
+	if (ControlledLight) {
 		//Calculate the Angle
 		FVector2D Base(0, -1);
 		double Yaw = FMath::Atan2(_Y, _X) - FMath::Atan2(Base.Y, Base.X);
@@ -131,12 +132,12 @@ void AControlPawn::RotateWithHardware_Gyro() {
 	//if _Yaw < -500.f, it means can no get input from hardware
 	if (_Yaw < -500.f) return;
 
-	FRotator CurRotation = ControledLight->GetActorRotation();
+	FRotator CurRotation = ControlledLight->GetActorRotation();
 	CurRotation.Pitch = _Pitch;
 	CurRotation.Yaw = _Yaw;
 	CurRotation.Roll = _Roll;
 	
-	ControledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), CurRotation, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
+	ControlledLight->SetActorRotation(FMath::RInterpTo(GetActorRotation(), CurRotation, UGameplayStatics::GetWorldDeltaSeconds(this), LerpRate));
 }
 
 void AControlPawn::Switch(){
@@ -193,6 +194,21 @@ void AControlPawn::HideMirrorWithEnhancedInput(const FInputActionValue& Value)
 	ChangeMirror(false);
 }
 
+void AControlPawn::RotateWithMouseInput(const FInputActionValue& Value)
+{
+	if (UseHardware)
+	{
+		return;
+	}
+
+	// Update target rotator
+	FVector2D Input = Value.Get<FVector2D>();
+	FRotator NewRotator = TargetRotator;
+	NewRotator.Yaw += Input.X * MouseSensitivity;
+	NewRotator.Pitch += Input.Y * MouseSensitivity;
+	TargetRotator = NewRotator;
+}
+
 void AControlPawn::ChangeLightWithHardware(int index){
 	if (EnabledLightIndex == index) return;
 	ChangeLight(index);
@@ -219,8 +235,8 @@ void AControlPawn::LightsInitialize()
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("SunLight"), OutActors);
 	SunLight = Cast<ADirectionalLight>(OutActors[0]);
 	Lights.Emplace(SunLight);
-	ControledLight = SunLight;
-	TargetRotator = ControledLight->GetActorRotation();
+	ControlledLight = SunLight;
+	TargetRotator = ControlledLight->GetActorRotation();
 
 	OutActors.Empty();
 
@@ -254,7 +270,7 @@ void AControlPawn::ChangeLight(int index)
 	if(index == 0)
 	{
 		EnabledLightIndex = 0;
-		ControledLight = Lights[index];
+		ControlledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(false);
 		MoonLight->SetActorHiddenInGame(true);
 		SunLight->SetActorRotation(MoonLight->GetActorRotation());
@@ -270,7 +286,7 @@ void AControlPawn::ChangeLight(int index)
 	else
 	{
 		EnabledLightIndex = 1;
-		ControledLight = Lights[index];
+		ControlledLight = Lights[index];
 		SunLight->SetActorHiddenInGame(true);
 		MoonLight->SetActorHiddenInGame(false);
 		MoonLight->SetActorRotation(SunLight->GetActorRotation());
