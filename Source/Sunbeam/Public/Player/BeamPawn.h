@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Beam/IBeamSpawner.h"
+#include "Interface/BeamSpawner.h"
 #include "GameFramework/Pawn.h"
 #include "BeamPawn.generated.h"
 
@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/* IBeamSpawner interface */
-	virtual void SpawnBeamAttached(UNiagaraSystem* BeamEffect, float MaxBeamLength) override;
+	virtual void SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass) override;
 	/* End IBeamSpawner interface */
 
 	// Rotate the beam
@@ -35,14 +35,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	TObjectPtr<UNiagaraSystem> DefaultBeamEffect;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	TSubclassOf<ABeamActor> BeamActorClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	float DefaultMaxBeamLength = 100.0f;
-
+	TSubclassOf<ABeamActor> DefaultBeamActorClass;
+	
 private:
 	TObjectPtr<ABeamActor> BeamActor;
 };

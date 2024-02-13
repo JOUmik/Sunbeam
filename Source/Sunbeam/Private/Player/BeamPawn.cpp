@@ -15,7 +15,7 @@ void ABeamPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnBeamAttached(DefaultBeamEffect, DefaultMaxBeamLength);
+	SpawnBeamActor_Implementation(DefaultBeamActorClass);
 }
 
 // Called every frame
@@ -24,27 +24,26 @@ void ABeamPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABeamPawn::SpawnBeamAttached(UNiagaraSystem* BeamEffect, float MaxBeamLength)
+void ABeamPawn::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass)
 {
 	// Spawn Beam actor and attach it to this actor
+	check(BeamActorClass)
 	BeamActor = GetWorld()->SpawnActor<ABeamActor>(BeamActorClass, GetActorLocation(), GetActorRotation());
-	BeamActor->InitializeBeam(BeamEffect, MaxBeamLength);
 	BeamActor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
 }
 
 void ABeamPawn::RotateBeamPawn(FVector2D RotateAxisVector)
 {
 	// Convert the current actor rotation to a quaternion
-	FQuat CurrentQuat = GetActorQuat();
+	const FQuat CurrentQuat = GetActorQuat();
 
 	// Create a quaternion for the yaw rotation around the global Z axis (up vector)
-	FQuat YawQuat = FQuat(FVector::UpVector, FMath::DegreesToRadians(RotateAxisVector.X));
+	const FQuat YawQuat = FQuat(FVector::UpVector, FMath::DegreesToRadians(RotateAxisVector.X));
 
 	// Create a quaternion for the pitch rotation around the global X axis (right vector)
-	FQuat PitchQuat = FQuat(FVector::RightVector, FMath::DegreesToRadians(-RotateAxisVector.Y));
+	const FQuat PitchQuat = FQuat(FVector::RightVector, FMath::DegreesToRadians(-RotateAxisVector.Y));
 
 	// Apply the rotations additively by multiplying the quaternions with the current rotation quaternion
-	// The order is important to ensure global axis rotations: first apply the yaw, then the pitch
 	FQuat NewQuat = YawQuat * PitchQuat * CurrentQuat;
 
 	// Normalize the resulting quaternion to ensure it represents a valid rotation
@@ -53,4 +52,3 @@ void ABeamPawn::RotateBeamPawn(FVector2D RotateAxisVector)
 	// Update the actor's rotation with the new quaternion
 	SetActorRotation(NewQuat);
 }
-

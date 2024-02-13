@@ -4,6 +4,7 @@
 #include "Beam/BeamActor.h"
 
 #include "NiagaraComponent.h"
+#include "Interface/Interactable.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -37,29 +38,8 @@ ABeamActor::ABeamActor()
 	BeamEffectComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BeamComponent"));
 	BeamEffectComponent->SetupAttachment(RootComponent);
 	BeamEffectComponent->SetAutoActivate(false);
-}
 
-void ABeamActor::InitializeBeam(UNiagaraSystem* InBeamEffect, float InMaxBeamLength)
-{
-	UNiagaraSystem* BeamEffect = DefaultBeamEffect;
-	if (InBeamEffect)
-	{
-		BeamEffect = InBeamEffect;
-	}
-	if (BeamEffect)
-	{
-		BeamEffectComponent->SetAsset(BeamEffect);
-		BeamEffectComponent->Activate();
-	}
-	else
-	{
-		BeamEffectComponent->Deactivate();
-	}
-
-	if (InMaxBeamLength > 0)
-	{
-		MaxBeamLength = InMaxBeamLength;
-	}
+	CurBeamHitResult = FHitResult();
 }
 
 void ABeamActor::BeginPlay()
@@ -71,24 +51,52 @@ void ABeamActor::BeginPlay()
 		BeamEffectComponent->SetAsset(DefaultBeamEffect);
 		BeamEffectComponent->Activate();
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("BeamActor %s has no default beam effect set!"), *GetName());
+	}
 }
 
 void ABeamActor::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	
+	RayTraceBeam(CurBeamHitResult);
 
-	FHitResult BeamHitResult = RayTraceBeam();
-	// TODO: If the beam hit something interactable, do something
+	// No need to check if the beam hits anything, cause if it doesn't, we just set the cur beam hit actor to nullptr
+	// will still trigger the end interact event if the last beam hit actor was valid
+	CurBeamHitActor = CurBeamHitResult.GetActor();
+	
+	if (CurBeamHitActor != LastBeamHitActor)
+	{
+		if (IsValid(LastBeamHitActor) && LastBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			IInteractable::Execute_OnEndInteract(LastBeamHitActor);
+		}
+		if (IsValid(CurBeamHitActor) && CurBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			IInteractable::Execute_OnBeginInteract(CurBeamHitActor, CurBeamHitResult);
+		}
+		LastBeamHitActor = CurBeamHitActor;
+	}
+	else
+	{
+		FString LastActorName = LastBeamHitActor ? LastBeamHitActor->GetName() : TEXT("None");
+		FString HitActorName = CurBeamHitActor ? CurBeamHitActor->GetName() : TEXT("None");
+		if (IsValid(CurBeamHitActor) && CurBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		{
+			IInteractable::Execute_OnTickInteract(CurBeamHitActor, CurBeamHitResult, DeltaSeconds);
+		}
+	}
 }
 
-
-FHitResult ABeamActor::RayTraceBeam() const
+// TODO: Raytracing beam support sweep and multi-hit
+bool ABeamActor::RayTraceBeam(FHitResult& CurHitResult) const
 {
 	// Trace from the actor's location towards forward
-	FVector TraceStartLocation = GetActorLocation();
+	const FVector TraceStartLocation = GetActorLocation();
 	FVector TraceEndLocation = TraceStartLocation + GetActorForwardVector() * MaxBeamLength;
 	
-	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
 	
@@ -100,23 +108,25 @@ FHitResult ABeamActor::RayTraceBeam() const
 	}
 #endif // ENABLE_DRAW_DEBUG
 	
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStartLocation, TraceEndLocation, ECollisionChannel::ECC_Visibility, CollisionParams))
+	if (GetWorld()->LineTraceSingleByChannel(CurHitResult, TraceStartLocation, TraceEndLocation, ECollisionChannel::ECC_Visibility, CollisionParams))
 	{
-		
 #if ENABLE_DRAW_DEBUG
 		if (SunBeamConsoleVariables::DrawBeamHitDuration > 0.0f)
 		{
-			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, SunBeamConsoleVariables::DrawBeamHitRadius, FColor::Red, false, SunBeamConsoleVariables::DrawBeamHitDuration);
+			DrawDebugPoint(GetWorld(), CurHitResult.ImpactPoint, SunBeamConsoleVariables::DrawBeamHitRadius, FColor::Red, false, SunBeamConsoleVariables::DrawBeamHitDuration);
 		}
 #endif // ENABLE_DRAW_DEBUG
 		
-		TraceEndLocation = HitResult.ImpactPoint;
-		return HitResult;
+		TraceEndLocation = CurHitResult.ImpactPoint;
+		SetBeamEndLocation(TraceEndLocation);
+		return true;
 	}
-	SetBeamEndLocation(TraceEndLocation);
-
-	
-	return FHitResult();
+	else
+	{
+		// If we didn't hit anything, set the beam end to the max length
+		SetBeamEndLocation(TraceEndLocation);
+		return false;
+	}
 }
 
 void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const

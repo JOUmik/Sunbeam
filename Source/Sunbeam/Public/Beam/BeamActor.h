@@ -19,15 +19,13 @@ public:
 	// Sets default values for this component's properties
 	ABeamActor();
 
-	void InitializeBeam(UNiagaraSystem* BeamEffect = nullptr, float MaxBeamLength = 0.0f);
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
-	
-	FHitResult RayTraceBeam() const;
+
+	bool RayTraceBeam(FHitResult& CurHitResult) const;
 
 	void SetBeamEndLocation(const FVector& EndLocation) const;
 
@@ -40,4 +38,13 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> BeamEffectComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
+	AActor* LastBeamHitActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
+	AActor* CurBeamHitActor;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
+	FHitResult CurBeamHitResult;
 };

@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IBeamSpawner.generated.h"
+#include "BeamSpawner.generated.h"
 
-class UNiagaraSystem;
+class ABeamActor;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UBeamSpawner : public UInterface
@@ -24,5 +25,6 @@ class SUNBEAM_API IBeamSpawner
 	GENERATED_BODY()
 
 public:
-	virtual void SpawnBeamAttached(UNiagaraSystem* BeamEffect, float MaxBeamLength) = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BeamSpawner")
+	void SpawnBeamActor(TSubclassOf<ABeamActor> BeamActorClass);
 };
