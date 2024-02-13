@@ -27,4 +27,7 @@ class SUNBEAM_API IBeamSpawner
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BeamSpawner")
 	void SpawnBeamActor(TSubclassOf<ABeamActor> BeamActorClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BeamSpawner")
+	ABeamActor* GetSpawnedBeamActor();
 };

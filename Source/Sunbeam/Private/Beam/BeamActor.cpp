@@ -46,15 +46,7 @@ void ABeamActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (DefaultBeamEffect)
-	{
-		BeamEffectComponent->SetAsset(DefaultBeamEffect);
-		BeamEffectComponent->Activate();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("BeamActor %s has no default beam effect set!"), *GetName());
-	}
+	BeamEffectComponent->Activate();
 }
 
 void ABeamActor::Tick(float DeltaSeconds)
@@ -69,13 +61,13 @@ void ABeamActor::Tick(float DeltaSeconds)
 	
 	if (CurBeamHitActor != LastBeamHitActor)
 	{
-		if (IsValid(LastBeamHitActor) && LastBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		if (CanInteractWithActor(LastBeamHitActor))
 		{
 			IInteractable::Execute_OnEndInteract(LastBeamHitActor);
 		}
-		if (IsValid(CurBeamHitActor) && CurBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		if (CanInteractWithActor(CurBeamHitActor))
 		{
-			IInteractable::Execute_OnBeginInteract(CurBeamHitActor, CurBeamHitResult);
+			IInteractable::Execute_OnBeginInteract(CurBeamHitActor, CurBeamHitResult, BeamSourceTag);
 		}
 		LastBeamHitActor = CurBeamHitActor;
 	}
@@ -83,9 +75,9 @@ void ABeamActor::Tick(float DeltaSeconds)
 	{
 		FString LastActorName = LastBeamHitActor ? LastBeamHitActor->GetName() : TEXT("None");
 		FString HitActorName = CurBeamHitActor ? CurBeamHitActor->GetName() : TEXT("None");
-		if (IsValid(CurBeamHitActor) && CurBeamHitActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+		if (CanInteractWithActor(CurBeamHitActor))
 		{
-			IInteractable::Execute_OnTickInteract(CurBeamHitActor, CurBeamHitResult, DeltaSeconds);
+			IInteractable::Execute_OnTickInteract(CurBeamHitActor, CurBeamHitResult, BeamSourceTag, DeltaSeconds);
 		}
 	}
 }
@@ -135,3 +127,20 @@ void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(0.5f, 0.5f, 10.0f));
 }
 
+bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
+{
+	if (!IsValid(OtherActor))
+	{
+		return false;
+	}
+	
+	if(!OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	{
+		return false;
+	}
+
+	// Check if the beam source tag is in the interactable tags
+	const IInteractable* Interactable = Cast<IInteractable>(OtherActor);
+	const FGameplayTagContainer& InteractableTags = Interactable->GetInteractableTags();
+	return InteractableTags.HasTag(BeamSourceTag);
+}

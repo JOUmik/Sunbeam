@@ -17,7 +17,6 @@ ABeamMirror::ABeamMirror()
 void ABeamMirror::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -27,7 +26,7 @@ void ABeamMirror::Tick(float DeltaTime)
 
 }
 
-void ABeamMirror::OnBeginInteract_Implementation(FHitResult BeamHitResult)
+void ABeamMirror::OnBeginInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag)
 {
 	/* TODO: Added a check so that new beam will not hit this mirror and spawn another new beam infinitely;
 	 * But current solution doesn't support a mirror to be hit by multiple beams at the same time.
@@ -51,10 +50,15 @@ void ABeamMirror::OnEndInteract_Implementation()
 	bIsBeingHit = false;
 }
 
-void ABeamMirror::OnTickInteract_Implementation(FHitResult BeamHitResult, float DeltaTime)
+void ABeamMirror::OnTickInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag, float DeltaTime)
 {
 	CurBeamHitData = BeamHitResult;
 	UpdateBeamActorByHitData();
+}
+
+const FGameplayTagContainer& ABeamMirror::GetInteractableTags() const
+{
+	return InteractableTags;
 }
 
 void ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass)
@@ -62,6 +66,11 @@ void ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActo
 	check(BeamActorClass)
 	
 	BeamActor = GetWorld()->SpawnActor<ABeamActor>(BeamActorClass, GetActorLocation(), GetActorRotation());
+}
+
+ABeamActor* ABeamMirror::GetSpawnedBeamActor_Implementation()
+{
+	return BeamActor;
 }
 
 void ABeamMirror::UpdateBeamActorByHitData() const

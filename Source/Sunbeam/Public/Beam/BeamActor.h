@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/SceneComponent.h"
 #include "BeamActor.generated.h"
 
 
+class IInteractable;
 class UNiagaraSystem;
 class UNiagaraComponent;
 
@@ -29,22 +31,24 @@ protected:
 
 	void SetBeamEndLocation(const FVector& EndLocation) const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Beam Effects")
-	TObjectPtr<UNiagaraSystem> DefaultBeamEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Beam Effects")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
 	float MaxBeamLength = 100.0f;
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Beam")
+	AActor* LastBeamHitActor;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Beam")
+	AActor* CurBeamHitActor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
+	FGameplayTag BeamSourceTag;
+
 private:
+	bool CanInteractWithActor(AActor* OtherActor) const;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> BeamEffectComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
-	AActor* LastBeamHitActor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
-	AActor* CurBeamHitActor;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	FHitResult CurBeamHitResult;
 };

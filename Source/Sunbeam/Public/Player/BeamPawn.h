@@ -25,6 +25,7 @@ public:
 
 	/* IBeamSpawner interface */
 	virtual void SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass) override;
+	virtual ABeamActor* GetSpawnedBeamActor_Implementation() override;
 	/* End IBeamSpawner interface */
 
 	// Rotate the beam
