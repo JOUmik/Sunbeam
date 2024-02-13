@@ -29,6 +29,11 @@ void ABeamMirror::Tick(float DeltaTime)
 
 void ABeamMirror::OnBeginInteract_Implementation(FHitResult BeamHitResult)
 {
+	/* TODO: Added a check so that new beam will not hit this mirror and spawn another new beam infinitely;
+	 * But current solution doesn't support a mirror to be hit by multiple beams at the same time.
+	 * Should add a way to have spawned beam by this mirror to ignore this mirror's collision.
+	 */
+	
 	if (bIsBeingHit)
 	{
 		return;
