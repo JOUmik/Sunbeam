@@ -17,6 +17,6 @@ public class Sunbeam : ModuleRules
 			"Sunbeam"
 		});
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "SERIALCOM" });
-		PrivateDependencyModuleNames.AddRange(new string[] { "Niagara" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Niagara", "GameplayTags" });
 	}
 }
