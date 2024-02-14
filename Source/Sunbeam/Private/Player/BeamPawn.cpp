@@ -32,6 +32,11 @@ void ABeamPawn::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorC
 	BeamActor->AttachToActor(this, FAttachmentTransformRules::SnapToTargetIncludingScale);
 }
 
+ABeamActor* ABeamPawn::GetSpawnedBeamActor_Implementation()
+{
+	return BeamActor;
+}
+
 void ABeamPawn::RotateBeamPawn(FVector2D RotateAxisVector)
 {
 	// Convert the current actor rotation to a quaternion
