@@ -21,7 +21,7 @@ public:
 	virtual void OnBeginInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag) override;
 	virtual void OnEndInteract_Implementation() override;
 	virtual void OnTickInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag, float DeltaTime) override;
-	virtual const FGameplayTagContainer& GetInteractableTags() const override;
+	virtual void GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
 	/* End IInteractable interface */
 
 	/* IBeamSpawner interface */

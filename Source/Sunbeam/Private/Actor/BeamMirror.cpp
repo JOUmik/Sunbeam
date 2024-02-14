@@ -56,9 +56,9 @@ void ABeamMirror::OnTickInteract_Implementation(FHitResult BeamHitResult, FGamep
 	UpdateBeamActorByHitData();
 }
 
-const FGameplayTagContainer& ABeamMirror::GetInteractableTags() const
+void ABeamMirror::GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer)
 {
-	return InteractableTags;
+	OutTagContainer = InteractableTags;
 }
 
 void ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass)

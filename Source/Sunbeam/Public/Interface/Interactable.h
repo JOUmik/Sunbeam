@@ -31,6 +31,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void OnTickInteract(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag, float DeltaTime);
 
-	UFUNCTION()
-	virtual const FGameplayTagContainer& GetInteractableTags() const = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
+	void GetInteractableTags(FGameplayTagContainer& OutTagContainer);
 };
