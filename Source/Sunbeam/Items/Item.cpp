@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Project SunBeam. All Rights Reserved.
 
 
 #include "Items/Item.h"
