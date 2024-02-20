@@ -39,6 +39,7 @@ ABeamActor* ABeamPawn::GetSpawnedBeamActor_Implementation()
 
 void ABeamPawn::RotateBeamPawn(FVector2D RotateAxisVector)
 {
+	/*
 	// Convert the current actor rotation to a quaternion
 	const FQuat CurrentQuat = GetActorQuat();
 
@@ -56,4 +57,28 @@ void ABeamPawn::RotateBeamPawn(FVector2D RotateAxisVector)
 
 	// Update the actor's rotation with the new quaternion
 	SetActorRotation(NewQuat);
+	*/
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), RotateAxisVector.X, RotateAxisVector.Y));
+
+	//Calculate the Angle
+	FVector2D Base(0, -1);
+	double Yaw = FMath::Atan2(RotateAxisVector.Y, RotateAxisVector.X) - FMath::Atan2(Base.Y, Base.X);
+	Yaw = FMath::RadiansToDegrees(Yaw);
+	if (Yaw <= 0) Yaw = FMath::Abs(Yaw);
+	else Yaw = 360.0f - Yaw;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Yaw: %f"), Yaw));
+
+	//Calculate thr Height Of Sun. (SunHeight == 0: Highest, SunHeight == 1: Lowest)
+	double SunHeight = FMath::Sqrt(FMath::Square(RotateAxisVector.X) + FMath::Square(RotateAxisVector.Y));
+	SunHeight = FMath::Min(SunHeight, 1.0f);
+	double YRotation;
+	//if (Input.Y >= 0) 
+	YRotation = 270 + SunHeight * 90;
+	//else YRotation = 270 + SunHeight * 90;
+	//FRotator CurRotator = ControledLight->GetActorRotation();
+	FRotator rotator(YRotation, Yaw, 0);
+		
+	SetActorRotation(rotator);
 }
