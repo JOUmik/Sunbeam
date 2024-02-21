@@ -25,6 +25,8 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void RotateBeam(const FInputActionValue& InputActionValue);
+
+	void SwitchBeamState(const FInputActionValue& InputActionValue);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
@@ -33,4 +35,7 @@ private:
 	// Additively apply 2D Axis input to the beam rotation
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> RotateAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SwitchBeamStateAction;
 };

@@ -5,6 +5,7 @@
 
 #include "NiagaraComponent.h"
 #include "Sunbeam.h"
+#include "Interface/BeamSpawner.h"
 #include "Interface/Interactable.h"
 
 namespace SunBeamConsoleVariables
@@ -87,13 +88,13 @@ void ABeamActor::Tick(float DeltaSeconds)
 	for (AActor* NewActor : NewActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[NewActor];
-		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, BeamSourceTag);
+		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, this);
 	}
 
 	for (AActor* OldActor : OldActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[OldActor];
-		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, BeamSourceTag, DeltaSeconds);
+		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, this, DeltaSeconds);
 	}
 
 	LastBeamHitInteractables = CurBeamHitInteractables;
@@ -159,14 +160,31 @@ void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(0.5f, 0.5f, 10.0f));
 }
 
-AActor* ABeamActor::GetBeamOwner() const
-{
-	return BeamOwner;
-}
-
 void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
 {
+	// check if the beam owner is valid and implements the IBeamSpawner interface
+	check(InBeamOwner);
+	check(InBeamOwner->GetClass()->ImplementsInterface(UBeamSpawner::StaticClass()));
 	BeamOwner = InBeamOwner;
+}
+
+void ABeamActor::SetBeamSourceTag(const FGameplayTag& InBeamSourceTag)
+{
+	BeamSourceTag = InBeamSourceTag;
+}
+
+void ABeamActor::SetBeamActiveStatus(bool bIsActive)
+{
+	SetActorTickEnabled(bIsActive);
+	SetActorHiddenInGame(not bIsActive);
+
+	if (not bIsActive)
+	{
+		for (AActor* LastBeamHitInteractable : LastBeamHitInteractables)
+		{
+			IInteractable::Execute_OnEndInteract(LastBeamHitInteractable);
+		}
+	}
 }
 
 bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
