@@ -76,7 +76,7 @@ void AControlPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 }
 
 void AControlPawn::RotateLightWithEnhancedInput(const FInputActionValue& Value) {
-	if(UseHardware) return;
+	//if(UseHardware) return;
 	
 	FVector2D Input = Value.Get<FVector2D>();
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Rotate: %f, %f"), Input.X, Input.Y));
