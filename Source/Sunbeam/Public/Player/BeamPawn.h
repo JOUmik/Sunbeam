@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ControlPawn.h"
 #include "GameplayTagContainer.h"
 #include "Interface/BeamSpawner.h"
 #include "GameFramework/Pawn.h"
