@@ -23,6 +23,7 @@ void ABeamPlayerController::SetupInputComponent()
 	check(EnhancedInputComponent);
 
 	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeam);
+	EnhancedInputComponent->BindAction(SwitchBeamStateAction, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState);
 	EnhancedInputComponent->BindAction(SwitchAction, ETriggerEvent::Started, this, &ABeamPlayerController::SwitchControlMethod);
 	EnhancedInputComponent->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeLightWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeMapWithEnhancedInput);
@@ -71,7 +72,15 @@ void ABeamPlayerController::RotateBeam(const FInputActionValue& InputActionValue
 	const FVector2D RotateAxisVector = InputActionValue.Get<FVector2D>();
 	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
 	{
-		BeamPawn->RotateBeamPawn(RotateAxisVector);
+		BeamPawn->RotateBeamPawn_MouseInput(RotateAxisVector);
+	}
+}
+
+void ABeamPlayerController::SwitchBeamState(const FInputActionValue& InputActionValue)
+{
+	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
+	{
+		BeamPawn->SwitchToNextBeamState();
 	}
 }
 

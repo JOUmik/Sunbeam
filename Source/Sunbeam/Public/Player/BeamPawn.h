@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ControlPawn.h"
+#include "GameplayTagContainer.h"
 #include "Interface/BeamSpawner.h"
 #include "GameFramework/Pawn.h"
 #include "BeamPawn.generated.h"
@@ -25,20 +26,28 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/* IBeamSpawner interface */
-	virtual void SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass) override;
-	virtual ABeamActor* GetSpawnedBeamActor_Implementation() override;
+	virtual ABeamActor* SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag) override;
+	virtual ABeamActor* GetOwningBeamActor_Implementation() override;
 	/* End IBeamSpawner interface */
 
 	// Rotate the beam
-	void RotateBeamPawn(FVector2D RotateAxisVector);
+	void RotateBeamPawn_MouseInput(FVector2D RotateAxisVector);
+	void RotateBeamPawn_ControllerInput(FVector2D RotateAxisVector);
+
+	// Move to next beam state
+	void SwitchToNextBeamState();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	TSubclassOf<ABeamActor> DefaultBeamActorClass;
+	TMap<FGameplayTag, TSubclassOf<ABeamActor>> BeamActorClasses;
 	
 private:
-	TObjectPtr<ABeamActor> BeamActor;
+	TMap<FGameplayTag, TObjectPtr<ABeamActor>> OwningBeamActors;
+
+	TObjectPtr<ABeamActor> CurBeamActor;
+	
+	FGameplayTag CurBeamTag;
 };

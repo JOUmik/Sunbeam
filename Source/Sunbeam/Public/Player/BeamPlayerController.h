@@ -44,6 +44,8 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void RotateBeam(const FInputActionValue& InputActionValue);
+
+	void SwitchBeamState(const FInputActionValue& InputActionValue);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
@@ -138,4 +140,7 @@ private:
 
 	FRotator CurRotator, TargetLightRotation;
 	USunbeamGameInstance* SunbeamGameInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SwitchBeamStateAction;
 };

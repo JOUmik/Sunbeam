@@ -22,7 +22,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
 	/**
 	 * @brief Call this from blueprint to set the bloom status of the flower.
 	 *

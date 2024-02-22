@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "BeamSpawner.generated.h"
 
+struct FGameplayTag;
 class ABeamActor;
 
 // This class does not need to be modified.
@@ -26,8 +27,8 @@ class SUNBEAM_API IBeamSpawner
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BeamSpawner")
-	void SpawnBeamActor(TSubclassOf<ABeamActor> BeamActorClass);
+	ABeamActor* SpawnBeamActor(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "BeamSpawner")
-	ABeamActor* GetSpawnedBeamActor();
+	ABeamActor* GetOwningBeamActor();
 };
