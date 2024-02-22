@@ -157,7 +157,8 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 {
 	BeamEffectComponent->SetVariableVec3(FName("Beam_end"), EndLocation);
-	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(0.5f, 0.5f, 10.0f));
+	float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
+	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(1, 1, ZSize));
 }
 
 void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
