@@ -22,8 +22,12 @@ public:
 	// Sets default values for this component's properties
 	ABeamActor();
 
-	AActor* GetBeamOwner() const;
+	FORCEINLINE AActor* GetBeamOwner() const { return BeamOwner.Get(); }
+	FORCEINLINE const FGameplayTag& GetBeamSourceTag() const { return BeamSourceTag; }
+	
 	void SetBeamOwner(AActor* InBeamOwner);
+	void SetBeamSourceTag(const FGameplayTag& InBeamSourceTag);
+	void SetBeamActiveStatus(bool bIsActive);
 
 protected:
 	// Called when the game starts
@@ -44,9 +48,6 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Beam")
 	TSet<AActor*> LastBeamHitInteractables;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	FGameplayTag BeamSourceTag;
-
 private:
 	bool CanInteractWithActor(AActor* OtherActor) const;
 
@@ -61,4 +62,6 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	TMap<AActor*, FHitResult> CurBeamHitData;
+
+	FGameplayTag BeamSourceTag;
 };
