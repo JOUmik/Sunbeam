@@ -45,7 +45,7 @@ void ABeamPlayerController::BeginPlay()
 	LightsInitialize();
 	ControlledActorsInitialize();
 
-	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &ABeamPlayerController::BPReadDate, 0.09f, true);
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &ABeamPlayerController::BPReadDate, 0.2f, true);
 
 	SunbeamGameInstance = Cast<USunbeamGameInstance>(GetGameInstance());
 	if (SunbeamGameInstance) UseHardware = SunbeamGameInstance->HardwareControlEnabled;
@@ -183,7 +183,7 @@ void ABeamPlayerController::ChangeMirrorWithHardware(int index)
 
 void ABeamPlayerController::RotateLevelWithHardware(int index)
 {
-
+	GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Blue, FString::Printf(TEXT("Rotate Index: %d"), index));
 }
 
 void ABeamPlayerController::LightsInitialize()
