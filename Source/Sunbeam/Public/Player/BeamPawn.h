@@ -7,14 +7,16 @@
 #include "GameplayTagContainer.h"
 #include "Interface/BeamSpawner.h"
 #include "GameFramework/Pawn.h"
+#include "Interface/EnergyStorage.h"
 #include "BeamPawn.generated.h"
 
+class UBeamEnergyStorageComponent;
 class ABeamActor;
 class UNiagaraComponent;
 class UNiagaraSystem;
 
 UCLASS()
-class SUNBEAM_API ABeamPawn : public APawn, public IBeamSpawner
+class SUNBEAM_API ABeamPawn : public APawn, public IBeamSpawner, public IEnergyStorage
 {
 	GENERATED_BODY()
 
@@ -30,6 +32,10 @@ public:
 	virtual ABeamActor* GetOwningBeamActor_Implementation() override;
 	/* End IBeamSpawner interface */
 
+	/* IEnergyStorage interface */
+	virtual UBeamEnergyStorageComponent* GetBeamEnergyStorageComponent() const override { return BeamEnergyStorageComponent; }
+	/* End IEnergyStorage interface */
+
 	// Rotate the beam
 	void RotateBeamPawn_MouseInput(FVector2D RotateAxisVector);
 	void RotateBeamPawn_ControllerInput(FVector2D RotateAxisVector);
@@ -40,14 +46,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Beam")
+	void OnEnergyChanged(int32 NewCurEnergy);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
+	TObjectPtr<UBeamEnergyStorageComponent> BeamEnergyStorageComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
 	TMap<FGameplayTag, TSubclassOf<ABeamActor>> BeamActorClasses;
-	
-private:
-	TMap<FGameplayTag, TObjectPtr<ABeamActor>> OwningBeamActors;
 
-	TObjectPtr<ABeamActor> CurBeamActor;
-	
+private:
 	FGameplayTag CurBeamTag;
+	TObjectPtr<ABeamActor> CurBeamActor;
+	TMap<FGameplayTag, TObjectPtr<ABeamActor>> OwningBeamActors;
 };
