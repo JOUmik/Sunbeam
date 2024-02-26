@@ -1,6 +1,8 @@
 // Copyright Project SunBeam. All Rights Reserved.
 
 #include "Player/BeamPawn.h"
+
+#include "ActorComponent/BeamEnergyStorageComponent.h"
 #include "Beam/BeamActor.h"
 
 // Sets default values
@@ -8,6 +10,9 @@ ABeamPawn::ABeamPawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	BeamEnergyStorageComponent = CreateDefaultSubobject<UBeamEnergyStorageComponent>(TEXT("BeamEnergyStorageComponent"));
+	BeamEnergyStorageComponent->OnBeamEnergyChangedDelegate.AddDynamic(this, &ABeamPawn::OnEnergyChanged);
 }
 
 // Called when the game starts or when spawned
@@ -28,6 +33,18 @@ void ABeamPawn::BeginPlay()
 	// After spawning all beam actors, cur beam tag is the last tag in the map
 	// So after switching, cur beam tag will be the first tag in the map
 	SwitchToNextBeamState();
+}
+
+void ABeamPawn::OnEnergyChanged(const int32 NewCurEnergy)
+{
+	// TODO: Change the light radius based on the current energy
+	for ( const auto& It : OwningBeamActors)
+	{
+		FGameplayTag BeamTag = It.Key;
+		int32 CurEnergy = BeamEnergyStorageComponent->GetCurEnergy(BeamTag);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::MakeRandomColor(), FString::Printf(TEXT("Beam Tag: %s, Energy: %d"), *BeamTag.ToString(), CurEnergy));
+	}
+	
 }
 
 // Called every frame
@@ -128,6 +145,8 @@ void ABeamPawn::SwitchToNextBeamState()
 				CurBeamActor = It.Value();
 			}
 
+			// TODO: Broadcast the current beam tag to change UI and ambient lighting
+			
 			CurBeamActor->SetBeamActiveStatus(true);
 			break;
 		}

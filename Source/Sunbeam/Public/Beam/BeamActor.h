@@ -7,10 +7,6 @@
 #include "Components/SceneComponent.h"
 #include "BeamActor.generated.h"
 
-
-class IBeamSpawner;
-class IInteractable;
-class UNiagaraSystem;
 class UNiagaraComponent;
 
 UCLASS()
@@ -21,9 +17,6 @@ class SUNBEAM_API ABeamActor : public AActor
 public:	
 	// Sets default values for this component's properties
 	ABeamActor();
-
-	FORCEINLINE AActor* GetBeamOwner() const { return BeamOwner.Get(); }
-	FORCEINLINE const FGameplayTag& GetBeamSourceTag() const { return BeamSourceTag; }
 	
 	void SetBeamOwner(AActor* InBeamOwner);
 	void SetBeamSourceTag(const FGameplayTag& InBeamSourceTag);
@@ -64,4 +57,8 @@ private:
 	TMap<AActor*, FHitResult> CurBeamHitData;
 
 	FGameplayTag BeamSourceTag;
+
+public:
+	FORCEINLINE AActor* GetBeamOwner() const { return BeamOwner.Get(); }
+	FORCEINLINE const FGameplayTag& GetBeamSourceTag() const { return BeamSourceTag; }
 };
