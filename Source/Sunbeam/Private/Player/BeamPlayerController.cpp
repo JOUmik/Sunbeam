@@ -45,7 +45,7 @@ void ABeamPlayerController::BeginPlay()
 	LightsInitialize();
 	ControlledActorsInitialize();
 
-	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &ABeamPlayerController::BPReadDate, 0.09f, true);
+	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &ABeamPlayerController::BPReadDate, 0.01f, true);
 
 	SunbeamGameInstance = Cast<USunbeamGameInstance>(GetGameInstance());
 	if (SunbeamGameInstance) UseHardware = SunbeamGameInstance->HardwareControlEnabled;
@@ -136,30 +136,7 @@ void ABeamPlayerController::RotateLevelWithEnhancedInput(const FInputActionValue
 
 	float Input = Value.Get<float>();
 
-	if (RotateControlledActor)
-	{
-		FRotator Rotation = RotateControlledActor->GetActorRotation();
-		//ture right, negative
-		if (Input > 0)
-		{
-			if (RotateIndex >= 0 || FMath::Abs(RotateIndex) < MaxRotateIndex)
-			{
-				RotateIndex--;
-				Rotation.Yaw -= RotatePerAngle;
-				TargetLevelRotation = Rotation;
-			}
-		}
-		//ture left, positive
-		else
-		{
-			if (RotateIndex <= 0 || RotateIndex < MaxRotateIndex)
-			{
-				RotateIndex++;
-				Rotation.Yaw += RotatePerAngle;
-				TargetLevelRotation = Rotation;
-			}
-		}
-	}
+	RotateLevel(Input);
 }
 
 void ABeamPlayerController::ChangeLightWithHardware(int index) {
@@ -183,7 +160,15 @@ void ABeamPlayerController::ChangeMirrorWithHardware(int index)
 
 void ABeamPlayerController::RotateLevelWithHardware(int index)
 {
+	if(index > 0) index = FMath::Min(index, MaxRotateIndex);
+	else index = FMath::Max(index, -MaxRotateIndex);
 
+	const int RotateGap = index - RotateIndex;
+	RotateLevel(RotateGap);
+	
+	RotateIndex = index;
+	
+	//GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Blue, FString::Printf(TEXT("Rotate Index: %d"), index));
 }
 
 void ABeamPlayerController::LightsInitialize()
@@ -280,5 +265,34 @@ void ABeamPlayerController::ChangeMap(int index)
 	if (UGameInstance* GameIns = GetGameInstance())
 	{
 		Cast<USunbeamGameInstance>(GameIns)->ChangeMap(index);
+	}
+}
+
+void ABeamPlayerController::RotateLevel(const int input)
+{
+	if (RotateControlledActor)
+	{
+		FRotator Rotation = TargetLevelRotation;
+		const float RotateAngle = RotatePerAngle * abs(input);
+		//ture right, negative
+		if (input > 0)
+		{
+			if (RotateIndex >= 0 || FMath::Abs(RotateIndex) < MaxRotateIndex)
+			{
+				RotateIndex-= abs(input);
+				Rotation.Yaw -= RotateAngle;
+				TargetLevelRotation = Rotation;
+			}
+		}
+		//ture left, positive
+		else
+		{
+			if (RotateIndex <= 0 || RotateIndex < MaxRotateIndex)
+			{
+				RotateIndex+= abs(input);
+				Rotation.Yaw += RotateAngle;
+				TargetLevelRotation = Rotation;
+			}
+		}
 	}
 }

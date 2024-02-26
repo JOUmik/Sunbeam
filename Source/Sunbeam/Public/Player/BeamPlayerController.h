@@ -119,6 +119,7 @@ private:
 
 	void ChangeLight(int index);
 	void ChangeMap(int index);
+	void RotateLevel(const int input);
 
 	ADirectionalLight* SunLight;
 	ADirectionalLight* MoonLight;
