@@ -23,26 +23,6 @@ public:
 	// Sets default values for this pawn's properties
 	AControlPawn();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _X = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _Y = 0; 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _Pitch = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _Yaw = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float _Roll = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool UseHardware = true;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SelectedHardware = 1;         //1:JoyCon, 2:Gyro
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -65,16 +45,35 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	int EnabledLightIndex = 0;
+	
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool UseHardware = true;
+
+	/*
+	 * RotateLevel Parameters
+	 */
+	AActor* RotateControlledActor;
+	FRotator TargetLevelRotation;
+	int32 OriginalIndex = 0;  //For Hardware Control
+	UPROPERTY(VisibleAnywhere, Category = "CPP Settings|Rotate Level")
+	int32 RotateIndex = 0;
+	UPROPERTY(EditAnywhere, Category = "CPP Settings|Rotate Level")
+	float RotatePerAngle = 5.f;
+	UPROPERTY(EditAnywhere, Category = "CPP Settings|Rotate Level")
+	int32 MaxRotateIndex = 6;
 
 private:
-	//Input Action
+	/*
+	 * EnhancedInput Actions
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* RotateAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwitchAction;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
-	UInputAction* HardwareSelectAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ChangeLightAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
@@ -83,32 +82,41 @@ private:
 	UInputAction* ChangeMirrorAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* RotateWithMouseAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
+	UInputAction* RotateLevelAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	float MouseSensitivity = 0.1f;
 
-	void RotateWithEnhancedInput(const FInputActionValue& Value);
-	void Switch();
-	void HardwareSelect(const FInputActionValue& Value);
+	/*
+	 * EnhanceInput control functions
+	 */
+	void RotateLightWithEnhancedInput(const FInputActionValue& Value);
+	void SwitchControlMethod();
 	void ChangeLightWithEnhancedInput(const FInputActionValue& Value);
 	void ChangeMapWithEnhancedInput(const FInputActionValue& Value);
 	void ShowMirrorWithEnhancedInput(const FInputActionValue& Value);
 	void HideMirrorWithEnhancedInput(const FInputActionValue& Value);
 	void RotateWithMouseInput(const FInputActionValue& Value);
+	void RotateLevelWithEnhancedInput(const FInputActionValue& Value);
 
-	UFUNCTION(BlueprintCallable)
-	void RotateWithHardware_JoyCon();
-	UFUNCTION(BlueprintCallable)
-	void RotateWithHardware_Gyro();
+	/*
+	 * Hardware control functions
+	 */
 	UFUNCTION(BlueprintCallable)
 	void ChangeLightWithHardware(int index);
 	UFUNCTION(BlueprintCallable)
 	void ChangeMapWithHardware(int index);
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
+	UFUNCTION(BlueprintCallable)
+	void RotateLevelWithHardware(int index);
 
+	/*
+	 * Initialize in BeginPlay
+	 */
 	void LightsInitialize();
-	void ItemsInitialize();
+	void ControlledActorsInitialize();
 
 	void ChangeLight(int index);
 	void ChangeMap(int index);
@@ -131,6 +139,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "CPPSettings|Lerp Setting")
 	double LerpRate = 10.f;
 
-	FRotator CurRotator, TargetRotator;
+	FRotator CurRotator, TargetLightRotation;
 	USunbeamGameInstance* SunbeamGameInstance;
+	
 };

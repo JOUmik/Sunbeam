@@ -5,6 +5,9 @@
 
 #include "NiagaraComponent.h"
 #include "Sunbeam.h"
+#include "ActorComponent/BeamEnergyStorageComponent.h"
+#include "Interface/BeamSpawner.h"
+#include "Interface/EnergyStorage.h"
 #include "Interface/Interactable.h"
 
 namespace SunBeamConsoleVariables
@@ -87,13 +90,13 @@ void ABeamActor::Tick(float DeltaSeconds)
 	for (AActor* NewActor : NewActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[NewActor];
-		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, BeamSourceTag);
+		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, this);
 	}
 
 	for (AActor* OldActor : OldActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[OldActor];
-		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, BeamSourceTag, DeltaSeconds);
+		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, this, DeltaSeconds);
 	}
 
 	LastBeamHitInteractables = CurBeamHitInteractables;
@@ -124,10 +127,6 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 #endif // ENABLE_DRAW_DEBUG
 
 		bHit = GetWorld()->SweepMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, FQuat::Identity, ECC_Light, FCollisionShape::MakeSphere(SweepRadius), CollisionParams);
-		if (bHit)
-		{
-			TraceEndLocation = OutHits.Last().ImpactPoint;
-		}
 	}
 	else
 	{
@@ -140,13 +139,12 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 		}
 #endif // ENABLE_DRAW_DEBUG
 		
-		FHitResult SingleHit;
-		bHit = GetWorld()->LineTraceSingleByChannel(SingleHit, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
-		if (bHit)
-		{
-			OutHits.Add(SingleHit);
-			TraceEndLocation = SingleHit.ImpactPoint;
-		}
+		bHit = GetWorld()->LineTraceMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
+	}
+
+	if (bHit)
+	{
+		TraceEndLocation = OutHits.Last().ImpactPoint;
 	}
 
 	SetBeamEndLocation(TraceEndLocation);
@@ -156,32 +154,48 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 {
 	BeamEffectComponent->SetVariableVec3(FName("Beam_end"), EndLocation);
-	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(0.5f, 0.5f, 10.0f));
-}
-
-AActor* ABeamActor::GetBeamOwner() const
-{
-	return BeamOwner;
+	float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
+	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(1, 1, ZSize));
 }
 
 void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
 {
+	// check if the beam owner is valid and implements the IBeamSpawner interface
+	check(InBeamOwner);
+	check(InBeamOwner->GetClass()->ImplementsInterface(UBeamSpawner::StaticClass()));
 	BeamOwner = InBeamOwner;
+}
+
+void ABeamActor::SetBeamSourceTag(const FGameplayTag& InBeamSourceTag)
+{
+	BeamSourceTag = InBeamSourceTag;
+}
+
+void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
+{
+	SetActorTickEnabled(bIsActive);
+	SetActorHiddenInGame(not bIsActive);
+
+	if (not bIsActive)
+	{
+		for (AActor* LastBeamHitInteractable : LastBeamHitInteractables)
+		{
+			IInteractable::Execute_OnEndInteract(LastBeamHitInteractable);
+		}
+
+		LastBeamHitInteractables.Empty();
+	}
 }
 
 bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
 {
-	if (!IsValid(OtherActor))
-	{
-		return false;
-	}
-	
-	if(!OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+	if (!IsValid(OtherActor) or !OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
 		return false;
 	}
 
 	// Check if the beam source tag is in the interactable tags
+	check(BeamSourceTag != FGameplayTag::EmptyTag);
 	const IInteractable* Interactable = Cast<IInteractable>(OtherActor);
 	FGameplayTagContainer InteractableTags;
 	Interactable->Execute_GetInteractableTags(OtherActor, InteractableTags);
