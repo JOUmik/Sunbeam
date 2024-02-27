@@ -86,7 +86,7 @@ void ABeamPlayerController::RotateBeamWithJoystick(const FInputActionValue& Inpu
 	}
 }
 
-void ABeamPlayerController::SwitchBeamState(const FInputActionValue& InputActionValue)
+void ABeamPlayerController::SwitchBeamState()
 {
 	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
 	{
@@ -230,43 +230,16 @@ void ABeamPlayerController::ChangeLight(int index)
 	if (index == 0)
 	{
 		EnabledLightIndex = 0;
-		ControlledLight = Lights[index];
-		if (SunLight && MoonLight)
-		{
-			SunLight->SetActorHiddenInGame(false);
-			MoonLight->SetActorHiddenInGame(true);
-			SunLight->SetActorRotation(MoonLight->GetActorRotation());
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(10, 2.f, FColor::Red, FString::Printf(TEXT("Missing SunLight or MoonLight in the scene")));
-		}
-		ChangeLightBeam();
+		
+		SwitchBeamState();
 	}
 	//Enable MoonLight and NightItems
 	else
 	{
 		EnabledLightIndex = 1;
-		ControlledLight = Lights[index];
-		if (SunLight && MoonLight)
-		{
-			SunLight->SetActorHiddenInGame(true);
-			MoonLight->SetActorHiddenInGame(false);
-			MoonLight->SetActorRotation(SunLight->GetActorRotation());
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(10, 2.f, FColor::Red, FString::Printf(TEXT("Missing SunLight or MoonLight in the scene")));
-		}
-		ChangeLightBeam();
-		for (int i = 0; i < DayItems.Num(); i++) {
-			DayItems[i]->SetActorHiddenInGame(true);
-			DayItems[i]->SetActorEnableCollision(false);
-		}
-		for (int i = 0; i < NightItems.Num(); i++) {
-			NightItems[i]->SetActorHiddenInGame(false);
-			NightItems[i]->SetActorEnableCollision(true);
-		}
+		
+		SwitchBeamState();
+		
 	}
 }
 
