@@ -26,14 +26,20 @@ void ABeamMirror::Tick(float DeltaTime)
 
 }
 
-void ABeamMirror::OnBeginInteract_Implementation(FHitResult BeamHitResult, const ABeamActor* BeamActor)
+void ABeamMirror::OnBeginInteract_Implementation(const FHitResult LightHitResult, AActor* LightSource)
 {
 	if (bIsBeingHit)
 	{
 		return;
 	}
+	const ABeamActor* BeamActor = Cast<ABeamActor>(LightSource);
+	if (!BeamActor)
+	{
+		return;
+	}
+	
 	// Spawn the beam at hit location, and set the beam's end location to the mirror's reflection location
-	CurBeamHitData = BeamHitResult;
+	CurBeamHitData = LightHitResult;
 
 	const TSubclassOf<ABeamActor> BeamActorClass = BeamActor->GetClass();
 	FGameplayTag BeamSourceTag = BeamActor->GetBeamSourceTag();
@@ -52,9 +58,9 @@ void ABeamMirror::OnEndInteract_Implementation()
 	bIsBeingHit = false;
 }
 
-void ABeamMirror::OnTickInteract_Implementation(FHitResult BeamHitResult, const ABeamActor* BeamActor, float DeltaTime)
+void ABeamMirror::OnTickInteract_Implementation(const FHitResult LightHitResult, AActor* LightSource, float DeltaTime)
 {
-	CurBeamHitData = BeamHitResult;
+	CurBeamHitData = LightHitResult;
 	UpdateBeamActorByHitData();
 }
 

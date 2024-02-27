@@ -7,7 +7,6 @@
 #include "Sunbeam.h"
 #include "ActorComponent/BeamEnergyStorageComponent.h"
 #include "Interface/BeamSpawner.h"
-#include "Interface/EnergyStorage.h"
 #include "Interface/Interactable.h"
 #include "Player/BeamPawn.h"
 #include "Singleton/LightTrackerObj.h"
@@ -73,7 +72,7 @@ void ABeamActor::Tick(float DeltaSeconds)
 		}
 #endif // ENABLE_DRAW_DEBUG
 		
-		if (CanInteractWithActor(HitResult.GetActor()))
+		if (CanInteractWithActor_Implementation(HitResult.GetActor()))
 		{
 			CurBeamHitInteractables.Add(HitResult.GetActor());
 			CurBeamHitData.Add(HitResult.GetActor(), HitResult);
@@ -114,16 +113,16 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 	CollisionParams.AddIgnoredActor(GetBeamOwner());
 	CollisionParams.bTraceComplex = true;
 	
-	bool bHit = false;
+	bool bHit;
 	if (SweepRadius > 0.0f)
 	{
 
 #if ENABLE_DRAW_DEBUG
 		if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
 		{
-			FVector SweepDirection = (TraceEndLocation - TraceStartLocation).GetSafeNormal();
-			float CapsuleLength = (TraceEndLocation - TraceStartLocation).Size() + 2 * SweepRadius; // Add diameter to cover both ends
-			FQuat CapsuleRotation = FRotationMatrix::MakeFromZ(SweepDirection).ToQuat();
+			const FVector SweepDirection = (TraceEndLocation - TraceStartLocation).GetSafeNormal();
+			const float CapsuleLength = (TraceEndLocation - TraceStartLocation).Size() + 2 * SweepRadius; // Add diameter to cover both ends
+			const FQuat CapsuleRotation = FRotationMatrix::MakeFromZ(SweepDirection).ToQuat();
 			DrawDebugCapsule(GetWorld(), TraceStartLocation + SweepDirection * (CapsuleLength * 0.5f - SweepRadius), CapsuleLength * 0.5f, SweepRadius, CapsuleRotation, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
 		}
 #endif // ENABLE_DRAW_DEBUG
@@ -156,7 +155,7 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 {
 	BeamEffectComponent->SetVariableVec3(FName("Beam_end"), EndLocation);
-	float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
+	const float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
 	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(1, 1, ZSize));
 
 	// TODO: Temp: Set player beam end pos to material collection
@@ -176,7 +175,7 @@ void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
 
 void ABeamActor::SetBeamSourceTag(const FGameplayTag& InBeamSourceTag)
 {
-	BeamSourceTag = InBeamSourceTag;
+	LightSourceTag = InBeamSourceTag;
 }
 
 void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
@@ -197,7 +196,12 @@ void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
 	ALightTrackerObj::GetInstance(GetWorld())->AddBeamCount(bIsActive ? 1 : -1);
 }
 
-bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
+FGameplayTag ABeamActor::GetLightSourceTag_Implementation() const
+{
+	return LightSourceTag;
+}
+
+bool ABeamActor::CanInteractWithActor_Implementation(AActor* OtherActor) const
 {
 	if (!IsValid(OtherActor) or !OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
@@ -205,9 +209,9 @@ bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
 	}
 
 	// Check if the beam source tag is in the interactable tags
-	check(BeamSourceTag != FGameplayTag::EmptyTag);
+	check(LightSourceTag != FGameplayTag::EmptyTag);
 	const IInteractable* Interactable = Cast<IInteractable>(OtherActor);
 	FGameplayTagContainer InteractableTags;
 	Interactable->Execute_GetInteractableTags(OtherActor, InteractableTags);
-	return InteractableTags.HasTag(BeamSourceTag);
+	return InteractableTags.HasTag(LightSourceTag);
 }
