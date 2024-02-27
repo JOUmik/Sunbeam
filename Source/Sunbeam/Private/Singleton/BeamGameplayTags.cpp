@@ -18,4 +18,9 @@ void FBeamGameplayTags::InitializeGameplayTags()
 		FName("LightSource.Moon"),
 		FString("Gameplay Tag for Moon Light Source")
 		);
+
+	GameplayTags.SecondarySource_Sunflower = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("SecondarySource.Sunflower"),
+		FString("Gameplay Tag for Sunflower Secondary Light Source")
+		);
 }

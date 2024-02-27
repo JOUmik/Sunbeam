@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "LightSource.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
-class ABeamActor;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UInteractable : public UInterface
@@ -24,13 +24,13 @@ class SUNBEAM_API IInteractable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void OnBeginInteract(FHitResult BeamHitResult, const ABeamActor* BeamActor);
+	void OnBeginInteract(FHitResult LightHitResult, AActor* LightSource);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void OnEndInteract();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void OnTickInteract(FHitResult BeamHitResult, const ABeamActor* BeamActor, float DeltaTime);
+	void OnTickInteract(FHitResult LightHitResult, AActor* LightSource, float DeltaTime);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void GetInteractableTags(FGameplayTagContainer& OutTagContainer);
