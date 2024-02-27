@@ -43,9 +43,6 @@ protected:
 	TSet<AActor*> CurOverlappingInteractables;
 
 private:
-	
 	UFUNCTION()
 	void OnBloomStatusChanged(bool bBloomed);
-
-	
 };

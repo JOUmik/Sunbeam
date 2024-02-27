@@ -5,6 +5,7 @@
 
 #include "Sunbeam.h"
 #include "Components/SphereComponent.h"
+#include "Singleton/LightTrackerObj.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -30,6 +31,13 @@ ABeamGlowingFlower::ABeamGlowingFlower()
 	GlowingRadiusComponent->OnComponentEndOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusEndOverlap);
 
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ABeamGlowingFlower::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetActorTickEnabled(false);
 }
 
 void ABeamGlowingFlower::Tick(float DeltaSeconds)
@@ -79,18 +87,13 @@ if (CanInteractWithActor_Implementation(OtherActor))
 	}
 }
 
-void ABeamGlowingFlower::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SetActorTickEnabled(false);
-}
-
 void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 {
 	// Set enable tick
 	SetActorTickEnabled(bBloomed);
 
 	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+
+	ALightTrackerObj::GetInstance(GetWorld())->AddSecondaryLightCount(bBloomed ? 1 : -1);
 }
 

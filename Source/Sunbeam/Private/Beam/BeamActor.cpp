@@ -8,6 +8,8 @@
 #include "ActorComponent/BeamEnergyStorageComponent.h"
 #include "Interface/BeamSpawner.h"
 #include "Interface/Interactable.h"
+#include "Player/BeamPawn.h"
+#include "Singleton/LightTrackerObj.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -155,6 +157,12 @@ void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 	BeamEffectComponent->SetVariableVec3(FName("Beam_end"), EndLocation);
 	const float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
 	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(1, 1, ZSize));
+
+	// TODO: Temp: Set player beam end pos to material collection
+	if (Cast<ABeamPawn>(GetBeamOwner()))
+	{
+		ALightTrackerObj::GetInstance(GetWorld())->SetMaterialVectorParameter(FName("LightPos"), FLinearColor(EndLocation));
+	}
 }
 
 void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
@@ -184,6 +192,8 @@ void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
 
 		LastBeamHitInteractables.Empty();
 	}
+
+	ALightTrackerObj::GetInstance(GetWorld())->AddBeamCount(bIsActive ? 1 : -1);
 }
 
 FGameplayTag ABeamActor::GetLightSourceTag_Implementation() const

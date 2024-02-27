@@ -15,7 +15,7 @@ class SUNBEAM_API ABeamActor : public AActor, public ILightSource
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	ABeamActor();
 	
@@ -27,6 +27,7 @@ public:
 	virtual FGameplayTag GetLightSourceTag_Implementation() const override;
 	virtual bool CanInteractWithActor_Implementation(AActor* OtherActor) const override;
 	/* End of LightSource Interface */
+
 
 protected:
 	// Called when the game starts
