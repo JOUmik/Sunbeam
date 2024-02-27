@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/SceneComponent.h"
+#include "Interface/LightSource.h"
 #include "BeamActor.generated.h"
 
 class UNiagaraComponent;
 
 UCLASS()
-class SUNBEAM_API ABeamActor : public AActor
+class SUNBEAM_API ABeamActor : public AActor, public ILightSource
 {
 	GENERATED_BODY()
 
@@ -21,6 +22,11 @@ public:
 	void SetBeamOwner(AActor* InBeamOwner);
 	void SetBeamSourceTag(const FGameplayTag& InBeamSourceTag);
 	void SetBeamActiveStatus(bool bIsActive);
+
+	/* LightSource Interface */
+	virtual FGameplayTag GetLightSourceTag_Implementation() const override;
+	virtual bool CanInteractWithActor_Implementation(AActor* OtherActor) const override;
+	/* End of LightSource Interface */
 
 protected:
 	// Called when the game starts
@@ -42,8 +48,6 @@ protected:
 	TSet<AActor*> LastBeamHitInteractables;
 
 private:
-	bool CanInteractWithActor(AActor* OtherActor) const;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> BeamOwner;
 	
@@ -56,9 +60,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "Beam Effects", meta = (AllowPrivateAccess = "true"))
 	TMap<AActor*, FHitResult> CurBeamHitData;
 
-	FGameplayTag BeamSourceTag;
+	FGameplayTag LightSourceTag;
 
 public:
 	FORCEINLINE AActor* GetBeamOwner() const { return BeamOwner.Get(); }
-	FORCEINLINE const FGameplayTag& GetBeamSourceTag() const { return BeamSourceTag; }
+	FORCEINLINE const FGameplayTag& GetBeamSourceTag() const { return LightSourceTag; }
 };

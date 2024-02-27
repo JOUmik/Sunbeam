@@ -11,6 +11,8 @@
 class USphereComponent;
 class UBeamEnergyStorageComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFlowerChangeBloomStatus, bool, NewStatus);
+
 UCLASS()
 class SUNBEAM_API ABeamFlowerBase : public AActor, public IInteractable, public IEnergyStorage
 {
@@ -22,7 +24,7 @@ public:
 
 	/* IInteractable interface */
 	virtual void GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
-	virtual void OnBeginInteract_Implementation(FHitResult BeamHitResult, const ABeamActor* BeamActor) override;
+	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
 	/* End IInteractable interface */
 
@@ -35,6 +37,9 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Flower")
 	void PlayBloomAnimReverse();
+
+	UPROPERTY(BlueprintAssignable, Category = "Flower")
+	FOnFlowerChangeBloomStatus OnFlowerChangeBloomStatusDelegate;
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,10 +74,7 @@ private:
 	
 	bool bHasBloomed = false;
 	bool bLastBloomStatus = false;
-
 	bool bIsChangingStatus = false;
 
-	FGameplayTag CurBeamSourceTag;
-
-	
+	FGameplayTag CurInteractingBeamSourceTag;
 };
