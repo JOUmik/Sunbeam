@@ -116,37 +116,38 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 	bool bHit;
 	if (SweepRadius > 0.0f)
 	{
+		bHit = GetWorld()->SweepMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, FQuat::Identity, ECC_Light, FCollisionShape::MakeSphere(SweepRadius), CollisionParams);
+	}
+	else
+	{
+		bHit = GetWorld()->LineTraceMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
+	}
+
+	if (OutHits.Num() > 0)
+	{
+		TraceEndLocation = OutHits.Last().ImpactPoint;
+	}
 
 #if ENABLE_DRAW_DEBUG
-		if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
+	if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
+	{
+		if (SweepRadius > 0.0f)
 		{
 			const FVector SweepDirection = (TraceEndLocation - TraceStartLocation).GetSafeNormal();
 			const float CapsuleLength = (TraceEndLocation - TraceStartLocation).Size() + 2 * SweepRadius; // Add diameter to cover both ends
 			const FQuat CapsuleRotation = FRotationMatrix::MakeFromZ(SweepDirection).ToQuat();
 			DrawDebugCapsule(GetWorld(), TraceStartLocation + SweepDirection * (CapsuleLength * 0.5f - SweepRadius), CapsuleLength * 0.5f, SweepRadius, CapsuleRotation, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
 		}
-#endif // ENABLE_DRAW_DEBUG
-
-		bHit = GetWorld()->SweepMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, FQuat::Identity, ECC_Light, FCollisionShape::MakeSphere(SweepRadius), CollisionParams);
-	}
-	else
-	{
-		
-#if ENABLE_DRAW_DEBUG
-		if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
+		else
 		{
 			static float DebugThickness = 1.0f;
 			DrawDebugLine(GetWorld(), TraceStartLocation, TraceEndLocation, FColor::Green, false, SunBeamConsoleVariables::DrawBeamTracesDuration, 0, DebugThickness);
 		}
-#endif // ENABLE_DRAW_DEBUG
-		
-		bHit = GetWorld()->LineTraceMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
-	}
 
-	if (bHit)
-	{
-		TraceEndLocation = OutHits.Last().ImpactPoint;
+		static float DebugPointSize = 5.0f;
+		DrawDebugPoint(GetWorld(), TraceEndLocation, DebugPointSize, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
 	}
+#endif // ENABLE_DRAW_DEBUG
 
 	SetBeamEndLocation(TraceEndLocation);
 	return bHit;
