@@ -5,7 +5,7 @@
 
 #include "Sunbeam.h"
 #include "Components/SphereComponent.h"
-#include "Singleton/LightTrackerObj.h"
+#include "Game/BeamGameModeBase.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -94,6 +94,8 @@ void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 
 	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 
-	ALightTrackerObj::GetInstance(GetWorld())->AddSecondaryLightCount(bBloomed ? 1 : -1);
+	ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+	check(BeamGameMode);
+	BeamGameMode->AddSecondaryLightCount(bBloomed ? 1 : -1);
 }
 

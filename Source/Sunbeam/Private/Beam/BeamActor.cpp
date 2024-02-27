@@ -6,10 +6,10 @@
 #include "NiagaraComponent.h"
 #include "Sunbeam.h"
 #include "ActorComponent/BeamEnergyStorageComponent.h"
+#include "Game/BeamGameModeBase.h"
 #include "Interface/BeamSpawner.h"
 #include "Interface/Interactable.h"
 #include "Player/BeamPawn.h"
-#include "Singleton/LightTrackerObj.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -162,7 +162,9 @@ void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 	// TODO: Temp: Set player beam end pos to material collection
 	if (Cast<ABeamPawn>(GetBeamOwner()))
 	{
-		ALightTrackerObj::GetInstance(GetWorld())->SetMaterialVectorParameter(FName("LightPos"), FLinearColor(EndLocation));
+		const ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+		check(BeamGameMode);
+		BeamGameMode->SetMaterialVectorParameter(FName("LightPos"), FLinearColor(EndLocation));
 	}
 }
 
@@ -194,7 +196,11 @@ void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
 		LastBeamHitInteractables.Empty();
 	}
 
-	ALightTrackerObj::GetInstance(GetWorld())->AddBeamCount(bIsActive ? 1 : -1);
+	// Get current game mode
+	ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+	check(BeamGameMode);
+
+	BeamGameMode->AddBeamCount(bIsActive ? 1 : -1);
 }
 
 FGameplayTag ABeamActor::GetLightSourceTag_Implementation() const
