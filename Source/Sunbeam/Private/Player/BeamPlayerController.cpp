@@ -22,7 +22,8 @@ void ABeamPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	check(EnhancedInputComponent);
 
-	EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeam);
+	EnhancedInputComponent->BindAction(RotateWithMouseInputAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeamWithMouseInput);
+	EnhancedInputComponent->BindAction(RotateWithJoystickAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeamWithJoystick);
 	EnhancedInputComponent->BindAction(SwitchBeamStateAction, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState);
 	EnhancedInputComponent->BindAction(SwitchAction, ETriggerEvent::Started, this, &ABeamPlayerController::SwitchControlMethod);
 	EnhancedInputComponent->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeLightWithEnhancedInput);
@@ -67,12 +68,21 @@ void ABeamPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void ABeamPlayerController::RotateBeam(const FInputActionValue& InputActionValue)
+void ABeamPlayerController::RotateBeamWithMouseInput(const FInputActionValue& InputActionValue)
 {
 	const FVector2D RotateAxisVector = InputActionValue.Get<FVector2D>();
 	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
 	{
 		BeamPawn->RotateBeamPawn_MouseInput(RotateAxisVector);
+	}
+}
+
+void ABeamPlayerController::RotateBeamWithJoystick(const FInputActionValue& InputActionValue)
+{
+	const FVector2D RotateAxisVector = InputActionValue.Get<FVector2D>();
+	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
+	{
+		BeamPawn->RotateBeamPawn_ControllerInput(RotateAxisVector);
 	}
 }
 
