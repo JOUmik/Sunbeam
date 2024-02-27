@@ -43,7 +43,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	void RotateBeam(const FInputActionValue& InputActionValue);
+	void RotateBeamWithMouseInput(const FInputActionValue& InputActionValue);
+	void RotateBeamWithJoystick(const FInputActionValue& InputActionValue);
 
 	void SwitchBeamState(const FInputActionValue& InputActionValue);
 	
@@ -72,7 +73,9 @@ private:
 	*/
 	// Additively apply 2D Axis input to the beam rotation
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> RotateAction;
+	TObjectPtr<UInputAction> RotateWithMouseInputAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> RotateWithJoystickAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwitchAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CPPSettings|Input Setting", meta = (AllowPrivateAccess = "true"))
