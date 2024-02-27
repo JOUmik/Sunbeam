@@ -40,12 +40,14 @@ void ABeamMirror::OnBeginInteract_Implementation(FHitResult BeamHitResult, const
 	AActor* BeamOwner = BeamActor->GetBeamOwner();
 	SpawnedBeamActor = SpawnBeamActor_Implementation(BeamActorClass, BeamSourceTag);
 	SpawnedBeamActor->SetBeamOwner(BeamOwner);
+	SpawnedBeamActor->SetBeamActiveStatus(true);
 	UpdateBeamActorByHitData();
 	bIsBeingHit = true;
 }
 
 void ABeamMirror::OnEndInteract_Implementation()
 {
+	SpawnedBeamActor->SetBeamActiveStatus(false);
 	SpawnedBeamActor->Destroy();
 	bIsBeingHit = false;
 }
