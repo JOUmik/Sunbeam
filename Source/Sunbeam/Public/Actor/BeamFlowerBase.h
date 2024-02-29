@@ -81,7 +81,4 @@ private:
 	bool bIsChangingStatus = false;
 	
 	FGameplayTag CurInteractingBeamSourceTag;
-
-	UPROPERTY()
-	TObjectPtr<AActor> CurLightSourceActor;
 };

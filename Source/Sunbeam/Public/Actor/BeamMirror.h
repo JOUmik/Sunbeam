@@ -50,7 +50,4 @@ private:
 	FHitResult CurBeamHitData;
 
 	bool bIsBeingHit = false;
-
-	UPROPERTY()
-	TObjectPtr<AActor> CurLightSourceActor;
 };

@@ -49,8 +49,6 @@ void ABeamMirror::OnBeginInteract_Implementation(const FHitResult LightHitResult
 	SpawnedBeamActor->SetBeamActiveStatus(true);
 	UpdateBeamActorByHitData();
 	bIsBeingHit = true;
-
-	CurLightSourceActor = LightSource;
 }
 
 void ABeamMirror::OnEndInteract_Implementation()
@@ -58,8 +56,6 @@ void ABeamMirror::OnEndInteract_Implementation()
 	SpawnedBeamActor->SetBeamActiveStatus(false);
 	SpawnedBeamActor->Destroy();
 	bIsBeingHit = false;
-
-	CurLightSourceActor = nullptr;
 }
 
 void ABeamMirror::OnTickInteract_Implementation(const FHitResult LightHitResult, AActor* LightSource, float DeltaTime)

@@ -40,8 +40,6 @@ void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, 
 	if (!CanInteractWithBeam()) return;
 	bIsChangingStatus = true;
 	bHasBloomed ? PlayBloomAnimReverse() : PlayBloomAnimForward();
-
-	CurLightSourceActor = LightSource;
 }
 
 void ABeamFlowerBase::OnEndInteract_Implementation()
@@ -51,8 +49,6 @@ void ABeamFlowerBase::OnEndInteract_Implementation()
 		return;
 	}
 	bHasBloomed ? PlayBloomAnimForward() : PlayBloomAnimReverse();
-
-	CurLightSourceActor = nullptr;
 }
 
 // Called when the game starts or when spawned
