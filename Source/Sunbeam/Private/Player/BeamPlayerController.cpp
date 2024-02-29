@@ -26,7 +26,6 @@ void ABeamPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(RotateWithJoystickAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeamWithJoystick);
 	EnhancedInputComponent->BindAction(SwitchBeamStateAction, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState);
 	EnhancedInputComponent->BindAction(SwitchAction, ETriggerEvent::Started, this, &ABeamPlayerController::SwitchControlMethod);
-	EnhancedInputComponent->BindAction(ChangeLightAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeLightWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeMapWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &ABeamPlayerController::ShowMirrorWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMirrorAction, ETriggerEvent::Completed, this, &ABeamPlayerController::HideMirrorWithEnhancedInput);
@@ -42,9 +41,6 @@ void ABeamPlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
-
-	LightsInitialize();
-	ControlledActorsInitialize();
 
 	GetWorldTimerManager().SetTimer(RotateTimeHandle, this, &ABeamPlayerController::BPReadDate, 0.01f, true);
 
@@ -102,15 +98,6 @@ void ABeamPlayerController::SwitchControlMethod() {
 	else GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hardware control close")));
 }
 
-void ABeamPlayerController::ChangeLightWithEnhancedInput(const FInputActionValue& Value) {
-	if (UseHardware) return;
-
-	float Input = Value.Get<float>();
-	int32 Input_int = FMath::RoundToInt32(Input) - 1;
-	if (EnabledLightIndex == Input_int) return;
-	ChangeLight(Input_int);
-}
-
 void ABeamPlayerController::ChangeMapWithEnhancedInput(const FInputActionValue& Value)
 {
 	if (UseHardware) return;
@@ -149,11 +136,6 @@ void ABeamPlayerController::RotateLevelWithEnhancedInput(const FInputActionValue
 	RotateLevel(Input);
 }
 
-void ABeamPlayerController::ChangeLightWithHardware(int index) {
-	if (EnabledLightIndex == index) return;
-	ChangeLight(index);
-}
-
 void ABeamPlayerController::ChangeMapWithHardware(int index)
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Map Index: %d"), index));
@@ -179,68 +161,6 @@ void ABeamPlayerController::RotateLevelWithHardware(int index)
 	RotateIndex = index;
 	
 	//GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Blue, FString::Printf(TEXT("Rotate Index: %d"), index));
-}
-
-void ABeamPlayerController::LightsInitialize()
-{
-	UClass* DirectionalLightClass = ADirectionalLight::StaticClass();
-	TArray<AActor*> OutActors;
-
-	if (OutActors.Num() != 0)
-	{
-		SunLight = Cast<ADirectionalLight>(OutActors[0]);
-		Lights.Emplace(SunLight);
-		ControlledLight = SunLight;
-		TargetLightRotation = ControlledLight->GetActorRotation();
-	}
-
-	OutActors.Empty();
-
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), DirectionalLightClass, TEXT("MoonLight"), OutActors);
-	if (OutActors.Num() != 0)
-	{
-		MoonLight = Cast<ADirectionalLight>(OutActors[0]);
-		MoonLight->SetActorHiddenInGame(true);
-		Lights.Emplace(MoonLight);
-	}
-}
-
-void ABeamPlayerController::ControlledActorsInitialize()
-{
-	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("RotateRoot"), OutActors);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("DayItem"), DayItems);
-	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("NightItem"), NightItems);
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("OutActors Num: %d"), OutActors.Num()));
-	if (OutActors.Num() == 1)
-	{
-		RotateControlledActor = OutActors[0];
-		TargetLevelRotation = RotateControlledActor->GetActorRotation();
-	}
-	for (int i = 0; i < NightItems.Num(); i++) {
-		NightItems[i]->SetActorHiddenInGame(true);
-		NightItems[i]->SetActorEnableCollision(false);
-	}
-}
-
-void ABeamPlayerController::ChangeLight(int index)
-{
-	//Enable SunLight and DayItems
-	if (index == 0)
-	{
-		EnabledLightIndex = 0;
-		
-		SwitchBeamState();
-	}
-	//Enable MoonLight and NightItems
-	else
-	{
-		EnabledLightIndex = 1;
-		
-		SwitchBeamState();
-		
-	}
 }
 
 void ABeamPlayerController::ChangeMap(int index)
