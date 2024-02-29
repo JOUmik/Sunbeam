@@ -23,9 +23,14 @@ ABeamFlowerBase::ABeamFlowerBase()
 	SetRootComponent(SphereComponent);
 }
 
-void ABeamFlowerBase::GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer)
+void ABeamFlowerBase::GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer)
 {
-	OutTagContainer = InteractableTags;
+	OutTagContainer = InteractableResponseTags;
+}
+
+void ABeamFlowerBase::GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag)
+{
+	OutGameplayTag = InteractableAssetTag;
 }
 
 void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource)
@@ -35,6 +40,8 @@ void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, 
 	if (!CanInteractWithBeam()) return;
 	bIsChangingStatus = true;
 	bHasBloomed ? PlayBloomAnimReverse() : PlayBloomAnimForward();
+
+	CurLightSourceActor = LightSource;
 }
 
 void ABeamFlowerBase::OnEndInteract_Implementation()
@@ -44,6 +51,8 @@ void ABeamFlowerBase::OnEndInteract_Implementation()
 		return;
 	}
 	bHasBloomed ? PlayBloomAnimForward() : PlayBloomAnimReverse();
+
+	CurLightSourceActor = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -91,7 +100,7 @@ bool ABeamFlowerBase::ConsumeEnergyFromPlayer() const
 	bool bSuccess = PlayerEnergyStorageComponent->ConsumeEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), CurInteractingBeamSourceTag);
 
 	// For flowers, energy is not stored per tag, so we need to add energy for all interactable tags the flower has
-	for (auto& InteractableTag : InteractableTags)
+	for (auto& InteractableTag : InteractableResponseTags)
 	{
 		bSuccess &= BeamEnergyStorageComponent->AddEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), InteractableTag);
 	}
@@ -111,7 +120,7 @@ bool ABeamFlowerBase::AddEnergyToPlayer() const
 	bool bSuccess = PlayerEnergyStorageComponent->AddEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), CurInteractingBeamSourceTag);
 
 	// For flowers, energy is not stored per tag, so we need to consume energy for all interactable tags the flower has
-	for (auto& InteractableTag : InteractableTags)
+	for (auto& InteractableTag : InteractableResponseTags)
 	{
 		bSuccess &= BeamEnergyStorageComponent->ConsumeEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), InteractableTag);
 	}

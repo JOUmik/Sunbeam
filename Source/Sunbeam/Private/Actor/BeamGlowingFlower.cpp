@@ -63,7 +63,7 @@ bool ABeamGlowingFlower::CanInteractWithActor_Implementation(AActor* OtherActor)
 	}
 
 	FGameplayTagContainer OtherInteractableTags;
-	IInteractable::Execute_GetInteractableTags(OtherActor, OtherInteractableTags);
+	IInteractable::Execute_GetInteractableResponseTags(OtherActor, OtherInteractableTags);
 	return OtherInteractableTags.HasTag(SecondaryLightSourceTag);
 }
 

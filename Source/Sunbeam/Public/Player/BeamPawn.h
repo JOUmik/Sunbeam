@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ControlPawn.h"
 #include "GameplayTagContainer.h"
 #include "Interface/BeamSpawner.h"
 #include "GameFramework/Pawn.h"
 #include "Interface/EnergyStorage.h"
 #include "BeamPawn.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FOnBeamStateChange);
 
 class UBeamEnergyStorageComponent;
 class ABeamActor;
@@ -42,7 +43,9 @@ public:
 
 	// Move to next beam state
 	void SwitchToNextBeamState();
-
+	
+	FOnBeamStateChange OnBeamStateChangeDelegate;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

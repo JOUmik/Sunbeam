@@ -33,5 +33,8 @@ public:
 	void OnTickInteract(FHitResult LightHitResult, AActor* LightSource, float DeltaTime);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void GetInteractableTags(FGameplayTagContainer& OutTagContainer);
+	void GetInteractableResponseTags(FGameplayTagContainer& OutTagContainer);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
+	void GetInteractableAssetTag(FGameplayTag& OutGameplayTag);
 };

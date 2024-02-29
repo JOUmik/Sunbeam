@@ -21,6 +21,7 @@ struct FBeamGameplayTags
 	FGameplayTag LightSource_Moon;
 	
 	FGameplayTag SecondarySource_Sunflower;
+	FGameplayTag SecondarySource_Lamp;
     
 private:
     static FBeamGameplayTags GameplayTags;

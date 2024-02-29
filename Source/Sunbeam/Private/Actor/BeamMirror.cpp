@@ -49,6 +49,8 @@ void ABeamMirror::OnBeginInteract_Implementation(const FHitResult LightHitResult
 	SpawnedBeamActor->SetBeamActiveStatus(true);
 	UpdateBeamActorByHitData();
 	bIsBeingHit = true;
+
+	CurLightSourceActor = LightSource;
 }
 
 void ABeamMirror::OnEndInteract_Implementation()
@@ -56,6 +58,8 @@ void ABeamMirror::OnEndInteract_Implementation()
 	SpawnedBeamActor->SetBeamActiveStatus(false);
 	SpawnedBeamActor->Destroy();
 	bIsBeingHit = false;
+
+	CurLightSourceActor = nullptr;
 }
 
 void ABeamMirror::OnTickInteract_Implementation(const FHitResult LightHitResult, AActor* LightSource, float DeltaTime)
@@ -64,9 +68,14 @@ void ABeamMirror::OnTickInteract_Implementation(const FHitResult LightHitResult,
 	UpdateBeamActorByHitData();
 }
 
-void ABeamMirror::GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer)
+void ABeamMirror::GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer)
 {
-	OutTagContainer = InteractableTags;
+	OutTagContainer = InteractableResponseTags;
+}
+
+void ABeamMirror::GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag)
+{
+	OutGameplayTag = InteractableAssetTag;
 }
 
 ABeamActor* ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag)

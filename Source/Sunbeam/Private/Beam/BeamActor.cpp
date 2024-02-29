@@ -219,6 +219,6 @@ bool ABeamActor::CanInteractWithActor_Implementation(AActor* OtherActor) const
 	check(LightSourceTag != FGameplayTag::EmptyTag);
 	const IInteractable* Interactable = Cast<IInteractable>(OtherActor);
 	FGameplayTagContainer InteractableTags;
-	Interactable->Execute_GetInteractableTags(OtherActor, InteractableTags);
+	IInteractable::Execute_GetInteractableResponseTags(OtherActor, InteractableTags);
 	return InteractableTags.HasTag(LightSourceTag);
 }
