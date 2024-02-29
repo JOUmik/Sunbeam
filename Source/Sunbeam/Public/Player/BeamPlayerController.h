@@ -46,7 +46,7 @@ protected:
 	void RotateBeamWithMouseInput(const FInputActionValue& InputActionValue);
 	void RotateBeamWithJoystick(const FInputActionValue& InputActionValue);
 
-	void SwitchBeamState(const FInputActionValue& InputActionValue);
+	void SwitchBeamState();
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
