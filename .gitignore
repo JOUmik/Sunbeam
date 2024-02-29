@@ -28,3 +28,8 @@ Build/
 Plugins/FMODStudio/Docs
 Plugins/FMODStudio/Intermediate
 Plugins/FMODStudio/Resources
+!Plugins/FMODStudio/Binaries
+Content/FMOD/Banks
+Content/FMOD/Buses
+Content/FMOD/Events
+Content/FMOD/PrivateIntegrationData
