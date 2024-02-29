@@ -22,3 +22,9 @@ Build/
 *.sdf
 *.suo
 *.xcworkspace
+
+
+#FMOD
+Plugins/FMODStudio/Docs
+Plugins/FMODStudio/Intermediate
+Plugins/FMODStudio/Resources
