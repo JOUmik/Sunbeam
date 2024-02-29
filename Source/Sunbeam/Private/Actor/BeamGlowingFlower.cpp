@@ -29,6 +29,7 @@ ABeamGlowingFlower::ABeamGlowingFlower()
 	GlowingRadiusComponent->SetCollisionResponseToChannel(ECC_Light, ECR_Ignore);
 	GlowingRadiusComponent->OnComponentBeginOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusBeginOverlap);
 	GlowingRadiusComponent->OnComponentEndOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusEndOverlap);
+	GlowingRadiusComponent->SetSphereRadius(100.0f);
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -93,6 +94,15 @@ void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 	SetActorTickEnabled(bBloomed);
 
 	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+
+	for (AActor* OverlappingActor : CurOverlappingInteractables)
+	{
+		if (!bBloomed)
+		{
+			Execute_OnEndInteract(OverlappingActor);
+		}
+	}
+	CurOverlappingInteractables.Empty();
 
 	ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
 	check(BeamGameMode);

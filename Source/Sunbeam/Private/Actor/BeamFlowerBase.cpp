@@ -149,4 +149,3 @@ bool ABeamFlowerBase::CanInteractWithBeam() const
 		return BeamEnergyStorageComponent->GetCurEnergy(CurInteractingBeamSourceTag) < BeamEnergyStorageComponent->GetMaxEnergy() && PlayerEnergyStorageComponent->GetCurEnergy(CurInteractingBeamSourceTag) >= BeamEnergyStorageComponent->GetMaxEnergy();
 	}
 }
-
