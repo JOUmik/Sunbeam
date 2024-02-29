@@ -5,7 +5,7 @@
 
 #include "Sunbeam.h"
 #include "Components/SphereComponent.h"
-#include "Singleton/LightTrackerObj.h"
+#include "Game/BeamGameModeBase.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -29,6 +29,7 @@ ABeamGlowingFlower::ABeamGlowingFlower()
 	GlowingRadiusComponent->SetCollisionResponseToChannel(ECC_Light, ECR_Ignore);
 	GlowingRadiusComponent->OnComponentBeginOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusBeginOverlap);
 	GlowingRadiusComponent->OnComponentEndOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusEndOverlap);
+	GlowingRadiusComponent->SetSphereRadius(100.0f);
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -63,7 +64,7 @@ bool ABeamGlowingFlower::CanInteractWithActor_Implementation(AActor* OtherActor)
 	}
 
 	FGameplayTagContainer OtherInteractableTags;
-	IInteractable::Execute_GetInteractableTags(OtherActor, OtherInteractableTags);
+	IInteractable::Execute_GetInteractableResponseTags(OtherActor, OtherInteractableTags);
 	return OtherInteractableTags.HasTag(SecondaryLightSourceTag);
 }
 
@@ -94,6 +95,17 @@ void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 
 	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 
-	ALightTrackerObj::GetInstance(GetWorld())->AddSecondaryLightCount(bBloomed ? 1 : -1);
+	for (AActor* OverlappingActor : CurOverlappingInteractables)
+	{
+		if (!bBloomed)
+		{
+			Execute_OnEndInteract(OverlappingActor);
+		}
+	}
+	CurOverlappingInteractables.Empty();
+
+	ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+	check(BeamGameMode);
+	BeamGameMode->AddSecondaryLightCount(bBloomed ? 1 : -1);
 }
 

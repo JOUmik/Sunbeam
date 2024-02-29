@@ -17,10 +17,15 @@ struct FBeamGameplayTags
 
 	static void InitializeGameplayTags();
 
+	FGameplayTag LightSourceBase;
 	FGameplayTag LightSource_Sun;
 	FGameplayTag LightSource_Moon;
-	
+
+	FGameplayTag SecondarySourceBase;
 	FGameplayTag SecondarySource_Sunflower;
+	FGameplayTag SecondarySource_Lamp;
+
+	FGameplayTag ObjectiveBase;
     
 private:
     static FBeamGameplayTags GameplayTags;
