@@ -50,8 +50,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
 	UFUNCTION(BlueprintCallable, Category = "Beam")
-	void OnEnergyChanged(int32 NewCurEnergy);
+	void OnEnergyChanged(int32 NewCurEnergy, FGameplayTag EnergyTypeTag);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
 	TObjectPtr<UBeamEnergyStorageComponent> BeamEnergyStorageComponent;

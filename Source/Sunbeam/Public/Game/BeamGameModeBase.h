@@ -7,6 +7,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "BeamGameModeBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnObjectiveCompletedCountChanged, int32, NewCompletedCount, int32, NewObjectiveCount);
+
 /**
  * 
  */
@@ -27,8 +29,13 @@ public:
 	void BufferInteractableByType();
 	void ShowInteractableByType(const FGameplayTag& InteractableType) const;
 
+	int32 GetObjectiveCount() const;
+	int32 GetObjectiveCompletedCount() const;
+
 	UFUNCTION()
 	void OnObjectiveStateChanged(bool bNewState);
+
+	FOnObjectiveCompletedCountChanged OnObjectiveCompletedCountChangeDelegate;
 
 private:
 	int32 BeamCount = 0;

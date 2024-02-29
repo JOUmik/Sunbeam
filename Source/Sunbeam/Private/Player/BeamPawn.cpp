@@ -5,6 +5,8 @@
 #include "ActorComponent/BeamEnergyStorageComponent.h"
 #include "Beam/BeamActor.h"
 #include "Game/BeamGameModeBase.h"
+#include "Player/BeamPlayerController.h"
+#include "UI/BeamHUD.h"
 
 // Sets default values
 ABeamPawn::ABeamPawn()
@@ -34,18 +36,22 @@ void ABeamPawn::BeginPlay()
 	// After spawning all beam actors, cur beam tag is the last tag in the map
 	// So after switching, cur beam tag will be the first tag in the map
 	SwitchToNextBeamState();
+
+	const ABeamPlayerController* BeamPlayerController = Cast<ABeamPlayerController>(GetController());
+	if (ABeamHUD* BeamHUD = Cast<ABeamHUD>(BeamPlayerController->GetHUD()))
+	{
+		BeamHUD->InitOverlay(BeamEnergyStorageComponent, GetWorld()->GetAuthGameMode<ABeamGameModeBase>());
+	}
 }
 
-void ABeamPawn::OnEnergyChanged(int32 NewCurEnergy)
+void ABeamPawn::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void ABeamPawn::OnEnergyChanged(int32 NewCurEnergy, FGameplayTag EnergyTypeTag)
 {
 	// TODO: Change the light radius based on the current energy
-	for ( const auto& It : OwningBeamActors)
-	{
-		FGameplayTag BeamTag = It.Key;
-		const int32 CurEnergy = BeamEnergyStorageComponent->GetCurEnergy(BeamTag);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::MakeRandomColor(), FString::Printf(TEXT("Beam Tag: %s, Energy: %d"), *BeamTag.ToString(), CurEnergy));
-	}
-	
 }
 
 // Called every frame

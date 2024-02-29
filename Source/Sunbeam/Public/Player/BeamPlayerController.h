@@ -96,7 +96,6 @@ private:
 	 * EnhanceInput control functions
 	 */
 	void SwitchControlMethod();
-	void ChangeLightWithEnhancedInput(const FInputActionValue& Value);
 	void ChangeMapWithEnhancedInput(const FInputActionValue& Value);
 	void ShowMirrorWithEnhancedInput(const FInputActionValue& Value);
 	void HideMirrorWithEnhancedInput(const FInputActionValue& Value);
@@ -106,33 +105,14 @@ private:
 	 * Hardware control functions
 	 */
 	UFUNCTION(BlueprintCallable)
-	void ChangeLightWithHardware(int index);
-	UFUNCTION(BlueprintCallable)
 	void ChangeMapWithHardware(int index);
 	UFUNCTION(BlueprintCallable)
 	void ChangeMirrorWithHardware(int index);
 	UFUNCTION(BlueprintCallable)
 	void RotateLevelWithHardware(int index);
-
-	/*
-	 * Initialize in BeginPlay
-	 */
-	void LightsInitialize();
-	void ControlledActorsInitialize();
-
-	void ChangeLight(int index);
+	
 	void ChangeMap(int index);
 	void RotateLevel(const int input);
-
-	ADirectionalLight* SunLight;
-	ADirectionalLight* MoonLight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<ADirectionalLight*> Lights;
-
-	//TArray<AActor*> Focals;
-	TArray<AActor*> DayItems;
-	TArray<AActor*> NightItems;
 
 	int MapIndex = 0;
 	int MirrorIndex = 0;

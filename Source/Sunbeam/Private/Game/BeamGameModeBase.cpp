@@ -118,9 +118,21 @@ void ABeamGameModeBase::ShowInteractableByType(const FGameplayTag& InteractableT
 	}
 }
 
-void ABeamGameModeBase::OnObjectiveStateChanged(bool bNewState)
+int32 ABeamGameModeBase::GetObjectiveCount() const
+{
+	return ObjectiveCount;
+}
+
+int32 ABeamGameModeBase::GetObjectiveCompletedCount() const
+{
+	return ObjectiveCompletedCount;
+}
+
+void ABeamGameModeBase::OnObjectiveStateChanged(const bool bNewState)
 {
 	ObjectiveCompletedCount += bNewState ? 1 : -1;
+	OnObjectiveCompletedCountChangeDelegate.Broadcast(ObjectiveCompletedCount, ObjectiveCount);
+	
 	if (ObjectiveCompletedCount == ObjectiveCount)
 	{
 		// All objectives are completed
