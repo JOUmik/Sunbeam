@@ -60,17 +60,15 @@ void ABeamFlowerBase::BeginPlay()
 // When the bloom animation reaches the end, the flower is in bloom. When the bloom animation was played in reverse and reaches the start, the flower is not in bloom.
 void ABeamFlowerBase::SetBloomStatus(const bool bBloomed)
 {
-	bHasBloomed = bBloomed;
-	bIsChangingStatus = false;
-
-	if (bHasBloomed == bLastBloomStatus)
+	if (bBloomed == bHasBloomed)
 	{
 		return;
 	}
-	bLastBloomStatus = bHasBloomed;
+	
+	bHasBloomed = bBloomed;
+	bIsChangingStatus = false;
 
 	const ABeamPawn* BeamPawn = Cast<ABeamPawn>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
-
 	if (!IsValid(BeamPawn))
 	{
 		return;

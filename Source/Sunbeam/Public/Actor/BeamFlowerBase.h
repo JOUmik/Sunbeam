@@ -77,7 +77,6 @@ private:
 	bool CanInteractWithBeam() const;
 	
 	bool bHasBloomed = false;
-	bool bLastBloomStatus = false;
 	bool bIsChangingStatus = false;
 	
 	FGameplayTag CurInteractingBeamSourceTag;
