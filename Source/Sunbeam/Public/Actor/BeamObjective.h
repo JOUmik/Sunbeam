@@ -22,7 +22,6 @@ public:
 	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
 	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
-	virtual void GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag) override;
 	/* End IInteractable interface */
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Objective")
@@ -43,9 +42,6 @@ protected:
 		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Objective")
 	FGameplayTagContainer InteractableResponseTags;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Objective")
-	FGameplayTag InteractableAssetTag;
 
 private:
 	int32 LightSourceCount = 0;

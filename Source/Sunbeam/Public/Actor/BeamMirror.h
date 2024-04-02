@@ -22,7 +22,6 @@ public:
 	virtual void OnEndInteract_Implementation() override;
 	virtual void OnTickInteract_Implementation(FHitResult LightHitResult, AActor* LightSource, float DeltaTime) override;
 	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
-	virtual void GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag) override;
 	/* End IInteractable interface */
 
 	/* IBeamSpawner interface */

@@ -28,16 +28,19 @@ void ABeamFlowerBase::GetInteractableResponseTags_Implementation(FGameplayTagCon
 	OutTagContainer = InteractableResponseTags;
 }
 
-void ABeamFlowerBase::GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag)
-{
-	OutGameplayTag = InteractableAssetTag;
-}
-
 void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource)
 {
-	if (!LightSource->GetClass()->ImplementsInterface(ULightSource::StaticClass())) return;
+	if (!LightSource->GetClass()->ImplementsInterface(ULightSource::StaticClass()))
+	{
+		return;
+	}
+	
 	CurInteractingBeamSourceTag = ILightSource::Execute_GetLightSourceTag(LightSource);
-	if (!CanInteractWithBeam()) return;
+	if (!CanInteractWithBeam())
+	{
+		return;
+	}
+	
 	bIsChangingStatus = true;
 	bHasBloomed ? PlayBloomAnimReverse() : PlayBloomAnimForward();
 }
@@ -48,6 +51,7 @@ void ABeamFlowerBase::OnEndInteract_Implementation()
 	{
 		return;
 	}
+	
 	bHasBloomed ? PlayBloomAnimForward() : PlayBloomAnimReverse();
 }
 

@@ -26,7 +26,6 @@ public:
 	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
 	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
-	virtual void GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag) override;
 	/* End IInteractable interface */
 
 	/* IEnergyStorage interface */
@@ -57,13 +56,10 @@ protected:
 	void SetBloomStatus(bool bBloomed);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
-	int32 EnergyValue = 10;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
 	FGameplayTagContainer InteractableResponseTags;
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
-	FGameplayTag InteractableAssetTag;
+	int32 EnergyValue = 10;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Flower")
 	TObjectPtr<UBeamEnergyStorageComponent> BeamEnergyStorageComponent;

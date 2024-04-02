@@ -24,8 +24,6 @@ struct FBeamGameplayTags
 	FGameplayTag SecondarySourceBase;
 	FGameplayTag SecondarySource_Sunflower;
 	FGameplayTag SecondarySource_Lamp;
-
-	FGameplayTag ObjectiveBase;
     
 private:
     static FBeamGameplayTags GameplayTags;

@@ -69,11 +69,6 @@ void ABeamMirror::GetInteractableResponseTags_Implementation(FGameplayTagContain
 	OutTagContainer = InteractableResponseTags;
 }
 
-void ABeamMirror::GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag)
-{
-	OutGameplayTag = InteractableAssetTag;
-}
-
 ABeamActor* ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag)
 {
 	check(BeamActorClass)

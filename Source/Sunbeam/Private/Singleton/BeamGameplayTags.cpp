@@ -38,9 +38,4 @@ void FBeamGameplayTags::InitializeGameplayTags()
 		FName("SecondarySource.Lamp"),
 		FString("Gameplay Tag for Lamp Secondary Light Source")
 		);
-
-	GameplayTags.ObjectiveBase = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Objective"),
-		FString("Gameplay Tag for Objective, used to define whether the owner is the level objective")
-		);
 }
