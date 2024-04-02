@@ -24,7 +24,6 @@ ABeamGlowingFlower::ABeamGlowingFlower()
 
 	GlowingRadiusComponent = CreateDefaultSubobject<USphereComponent>(TEXT("GlowingRadius"));
 	GlowingRadiusComponent->SetupAttachment(RootComponent);
-	GlowingRadiusComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GlowingRadiusComponent->SetGenerateOverlapEvents(true);
 	GlowingRadiusComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
 	GlowingRadiusComponent->SetCollisionResponseToChannel(ECC_Light, ECR_Ignore);
