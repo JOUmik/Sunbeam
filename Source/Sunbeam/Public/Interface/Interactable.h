@@ -34,7 +34,4 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void GetInteractableResponseTags(FGameplayTagContainer& OutTagContainer);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void GetInteractableAssetTag(FGameplayTag& OutGameplayTag);
 };

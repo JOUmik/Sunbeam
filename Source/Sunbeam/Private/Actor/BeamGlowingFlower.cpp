@@ -24,7 +24,8 @@ ABeamGlowingFlower::ABeamGlowingFlower()
 
 	GlowingRadiusComponent = CreateDefaultSubobject<USphereComponent>(TEXT("GlowingRadius"));
 	GlowingRadiusComponent->SetupAttachment(RootComponent);
-	GlowingRadiusComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GlowingRadiusComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GlowingRadiusComponent->SetGenerateOverlapEvents(true);
 	GlowingRadiusComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
 	GlowingRadiusComponent->SetCollisionResponseToChannel(ECC_Light, ECR_Ignore);
 	GlowingRadiusComponent->OnComponentBeginOverlap.AddDynamic(this, &ABeamGlowingFlower::OnGlowingRadiusBeginOverlap);
@@ -38,7 +39,7 @@ void ABeamGlowingFlower::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetActorTickEnabled(false);
+	OnBloomStatusChanged(false);
 }
 
 void ABeamGlowingFlower::Tick(float DeltaSeconds)
@@ -53,7 +54,7 @@ void ABeamGlowingFlower::Tick(float DeltaSeconds)
 
 FGameplayTag ABeamGlowingFlower::GetLightSourceTag_Implementation() const
 {
-	return SecondaryLightSourceTag;
+	return SecondaryLightTag;
 }
 
 bool ABeamGlowingFlower::CanInteractWithActor_Implementation(AActor* OtherActor) const
@@ -65,7 +66,7 @@ bool ABeamGlowingFlower::CanInteractWithActor_Implementation(AActor* OtherActor)
 
 	FGameplayTagContainer OtherInteractableTags;
 	IInteractable::Execute_GetInteractableResponseTags(OtherActor, OtherInteractableTags);
-	return OtherInteractableTags.HasTag(SecondaryLightSourceTag);
+	return OtherInteractableTags.HasTag(SecondaryLightTag);
 }
 
 void ABeamGlowingFlower::OnGlowingRadiusBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -92,8 +93,8 @@ void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 {
 	// Set enable tick
 	SetActorTickEnabled(bBloomed);
-
-	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	
+	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 
 	for (AActor* OverlappingActor : CurOverlappingInteractables)
 	{

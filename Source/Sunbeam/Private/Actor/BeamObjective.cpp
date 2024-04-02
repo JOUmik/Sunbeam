@@ -33,11 +33,6 @@ void ABeamObjective::GetInteractableResponseTags_Implementation(FGameplayTagCont
 	OutTagContainer = InteractableResponseTags;
 }
 
-void ABeamObjective::GetInteractableAssetTag_Implementation(FGameplayTag& OutGameplayTag)
-{
-	OutGameplayTag = InteractableAssetTag;
-}
-
 void ABeamObjective::SetBloomStatus(const bool bBloomed)
 {
 	OnObjectiveStateChangedDelegate.Broadcast(bBloomed);

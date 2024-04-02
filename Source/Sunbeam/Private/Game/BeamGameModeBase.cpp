@@ -39,6 +39,7 @@ void ABeamGameModeBase::SetMaterialScalarParameter(const FName ParameterName, co
 	{
 		return;
 	}
+	
 	if (const UMaterialParameterCollection* Collection = LoadObject<UMaterialParameterCollection>(nullptr, TEXT("/Game/Materials/Interact/GetLightCount")))
 	{
 		if (UMaterialParameterCollectionInstance* CollectionInstance = GetWorld()->GetParameterCollectionInstance(Collection))
@@ -73,32 +74,22 @@ void ABeamGameModeBase::BufferInteractableByType()
 	{
 		if (Interactable->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 		{
-			FGameplayTag InteractableAssetTag;
-			IInteractable::Execute_GetInteractableAssetTag(Interactable, InteractableAssetTag);
-			if (InteractableAssetTag != FGameplayTag::EmptyTag)
+			FGameplayTagContainer InteractableResponseTags;
+			IInteractable::Execute_GetInteractableResponseTags(Interactable, InteractableResponseTags);
+
+			FBeamGameplayTags BeamGameplayTags = FBeamGameplayTags::Get();
+			for (auto& Tag : InteractableResponseTags)
+            {
+				if (Tag.MatchesTag(BeamGameplayTags.LightSourceBase))
+				{
+					InteractableMap.FindOrAdd(Tag).Add(Interactable);
+				}
+            }
+			
+			if (ABeamObjective* Objective = Cast<ABeamObjective>(Interactable))
 			{
-				FBeamGameplayTags BeamGameplayTags = FBeamGameplayTags::Get();
-				if (InteractableAssetTag.MatchesTag(BeamGameplayTags.LightSourceBase))
-				{
-					InteractableMap.FindOrAdd(InteractableAssetTag).Add(Interactable);
-
-					// Add the children of the interactable to the map
-					TArray<AActor*> ChildActors;
-					Interactable->GetAttachedActors(ChildActors);
-					for (AActor* ChildActor : ChildActors)
-					{
-						InteractableMap.FindOrAdd(InteractableAssetTag).Add(ChildActor);
-					}
-				}
-
-				if (InteractableAssetTag.MatchesTag(BeamGameplayTags.ObjectiveBase))
-				{
-					if (ABeamObjective* Objective = Cast<ABeamObjective>(Interactable))
-					{
-						Objective->OnObjectiveStateChangedDelegate.AddDynamic(this, &ABeamGameModeBase::OnObjectiveStateChanged);
-						ObjectiveCount++;
-					}
-				}
+				Objective->OnObjectiveStateChangedDelegate.AddDynamic(this, &ABeamGameModeBase::OnObjectiveStateChanged);
+				ObjectiveCount++;
 			}
 		}
 	}
@@ -106,14 +97,21 @@ void ABeamGameModeBase::BufferInteractableByType()
 
 void ABeamGameModeBase::ShowInteractableByType(const FGameplayTag& InteractableType) const
 {
-	for (const auto& InteractablePair : InteractableMap)
+	// 1. Set hidden for all interactables
+	for (const auto& InteractableArray : InteractableMap)
 	{
-		const bool bShow = (InteractablePair.Key == InteractableType);
-		for (AActor* Interactable : InteractablePair.Value)
+		for (AActor* Interactable : InteractableArray.Value)
 		{
-			Interactable->SetActorHiddenInGame(!bShow);
-			Interactable->SetActorTickEnabled(bShow);
-			Interactable->SetActorEnableCollision(bShow);
+			Interactable->SetActorHiddenInGame(true);
+		}
+	}
+
+	// 2. Set visible for interactables with the given type
+	if (const TArray<AActor*>* InteractableArray = InteractableMap.Find(InteractableType))
+	{
+		for (AActor* Interactable : *InteractableArray)
+		{
+			Interactable->SetActorHiddenInGame(false);
 		}
 	}
 }
