@@ -40,11 +40,6 @@ void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, 
 	{
 		return;
 	}
-
-	if (IsHidden())
-	{
-		return;
-	}
 	
 	bIsChangingStatus = true;
 	bHasBloomed ? PlayBloomAnimReverse() : PlayBloomAnimForward();
@@ -53,11 +48,6 @@ void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, 
 void ABeamFlowerBase::OnEndInteract_Implementation()
 {
 	if (!bIsChangingStatus)
-	{
-		return;
-	}
-	
-	if (IsHidden())
 	{
 		return;
 	}

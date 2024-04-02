@@ -41,6 +41,5 @@ void ABeamObjective::SetBloomStatus(const bool bBloomed)
 void ABeamObjective::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
