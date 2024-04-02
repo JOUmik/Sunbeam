@@ -93,7 +93,7 @@ void ABeamGlowingFlower::OnBloomStatusChanged(const bool bBloomed)
 	// Set enable tick
 	SetActorTickEnabled(bBloomed);
 	
-	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+	GlowingRadiusComponent->SetCollisionEnabled(bBloomed ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 
 	for (AActor* OverlappingActor : CurOverlappingInteractables)
 	{
