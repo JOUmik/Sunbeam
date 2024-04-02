@@ -76,11 +76,10 @@ void ABeamGameModeBase::BufferInteractableByType()
 		{
 			FGameplayTagContainer InteractableResponseTags;
 			IInteractable::Execute_GetInteractableResponseTags(Interactable, InteractableResponseTags);
-
-			FBeamGameplayTags BeamGameplayTags = FBeamGameplayTags::Get();
+			
 			for (auto& Tag : InteractableResponseTags)
             {
-				if (Tag.MatchesTag(BeamGameplayTags.LightSourceBase))
+				if (Tag.MatchesTag(SunbeamGameplayTags::LightSourceBase))
 				{
 					InteractableMap.FindOrAdd(Tag).Add(Interactable);
 				}

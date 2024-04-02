@@ -2,40 +2,15 @@
 
 
 #include "Singleton/BeamGameplayTags.h"
-#include "GameplayTagContainer.h"
-#include "GameplayTagsManager.h"
 
-FBeamGameplayTags FBeamGameplayTags::GameplayTags;
-
-void FBeamGameplayTags::InitializeGameplayTags()
+namespace SunbeamGameplayTags
 {
-	GameplayTags.LightSourceBase = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("LightSource"),
-		FString("Light Source Base Tag, used to define interactions and visibility")
-		);
-	
-	GameplayTags.LightSource_Sun = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("LightSource.Sun"),
-		FString("Gameplay Tag for Sun Light Source")
-		);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(LightSourceBase, "LightSource", "Light Source Base Tag, used to define interactions and visibility");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(LightSource_Sun, "LightSource.Sun", "Gameplay Tag for Sun Light Source");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(LightSource_Moon, "LightSource.Moon", "Gameplay Tag for Moon Light Source");
 
-	GameplayTags.LightSource_Moon = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("LightSource.Moon"),
-		FString("Gameplay Tag for Moon Light Source")
-		);
-
-	GameplayTags.SecondarySourceBase = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("SecondarySource"),
-		FString("Secondary Light Source Base Tag")
-		);
-
-	GameplayTags.SecondarySource_Sunflower = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("SecondarySource.Sunflower"),
-		FString("Gameplay Tag for Sunflower Secondary Light Source")
-		);
-
-	GameplayTags.SecondarySource_Lamp = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("SecondarySource.Lamp"),
-		FString("Gameplay Tag for Lamp Secondary Light Source")
-		);
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SecondarySourceBase, "SecondarySource", "Secondary Light Source Base Tag");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SecondarySource_Sunflower, "SecondarySource.Sunflower", "Gameplay Tag for Sunflower Secondary Light Source");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(SecondarySource_Lamp, "SecondarySource.Lamp", "Gameplay Tag for Lamp Secondary Light Source");
 }
+
