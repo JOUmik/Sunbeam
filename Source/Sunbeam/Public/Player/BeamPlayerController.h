@@ -57,6 +57,7 @@ protected:
 	/*
 	 * RotateLevel Parameters
 	 */
+	UPROPERTY()
 	AActor* RotateControlledActor;
 	FRotator TargetLevelRotation;
 	int32 OriginalIndex = 0;  //For Hardware Control

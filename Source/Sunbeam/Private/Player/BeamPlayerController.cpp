@@ -46,6 +46,14 @@ void ABeamPlayerController::BeginPlay()
 
 	SunbeamGameInstance = Cast<USunbeamGameInstance>(GetGameInstance());
 	if (SunbeamGameInstance) UseHardware = SunbeamGameInstance->HardwareControlEnabled;
+
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), TEXT("RotateRoot"), OutActors);
+	if (OutActors.Num() == 1)
+	{
+		RotateControlledActor = OutActors[0];
+		TargetLevelRotation = RotateControlledActor->GetActorRotation();
+	}
 }
 
 // Called every frame
