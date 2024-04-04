@@ -7,7 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "BeamEnergyStorageComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeamEnergyChanged, int32, NewCurEnergy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBeamEnergyChanged, int32, NewEnergy, FGameplayTag, EnergyTypeTag);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,10 +22,6 @@ public:
 	bool ConsumeEnergy(int32 EnergyToConsume, FGameplayTag EnergyTypeTag);
 
 	bool AddEnergy(int32 EnergyToAdd, FGameplayTag EnergyTypeTag);
-	
-	int32 GetCurEnergy(FGameplayTag EnergyTypeTag) const;
-
-	int32 GetMaxEnergy() const;
 
 	FOnBeamEnergyChanged OnBeamEnergyChangedDelegate;
 
@@ -38,4 +34,19 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+public:
+	FORCEINLINE int32 GetCurEnergy(const FGameplayTag EnergyTypeTag) const
+	{
+		// For interactables, initially the energy type tag will be empty
+		if (!CurrentEnergyPerTag.Contains(EnergyTypeTag))
+		{
+			return 0;
+		}
+	
+		return CurrentEnergyPerTag.FindChecked(EnergyTypeTag);
+	}
+	
+	FORCEINLINE int32 GetMaxEnergy() const { return MaxEnergy; }
+	FORCEINLINE TMap<FGameplayTag, int32> GetCurrentEnergyPerTag() const { return CurrentEnergyPerTag; }
 };

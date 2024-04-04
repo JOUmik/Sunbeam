@@ -6,7 +6,6 @@
 #include "GameplayTagContainer.h"
 #include "Interface/BeamSpawner.h"
 #include "Interface/Interactable.h"
-#include "Interface/LightSource.h"
 #include "BeamMirror.generated.h"
 
 UCLASS()
@@ -22,7 +21,7 @@ public:
 	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
 	virtual void OnTickInteract_Implementation(FHitResult LightHitResult, AActor* LightSource, float DeltaTime) override;
-	virtual void GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
+	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
 	/* End IInteractable interface */
 
 	/* IBeamSpawner interface */
@@ -31,7 +30,10 @@ public:
 	/* End IBeamSpawner interface */
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam Interaction")
-	FGameplayTagContainer InteractableTags;
+	FGameplayTagContainer InteractableResponseTags;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam Interaction")
+	FGameplayTag InteractableAssetTag;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,11 +45,8 @@ protected:
 private:
 	void UpdateBeamActorByHitData() const;
 	
-
-private:
 	TObjectPtr<ABeamActor> SpawnedBeamActor;
-
-	FHitResult CurBeamHitData; // TODO: Replace with custom struct that only contains the necessary data
+	FHitResult CurBeamHitData;
 
 	bool bIsBeingHit = false;
 };
