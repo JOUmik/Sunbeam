@@ -33,16 +33,16 @@ protected:
 	
 	virtual void Tick(float DeltaSeconds) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
-	FGameplayTag SecondaryLightSourceTag;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flower")
+	FGameplayTag SecondaryLightTag;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Flower")
 	TObjectPtr<USphereComponent> GlowingRadiusComponent;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Flower")
+	UPROPERTY(BlueprintReadOnly, Category = "Flower")
 	TSet<AActor*> CurOverlappingInteractables;
 
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnBloomStatusChanged(bool bBloomed);
 };

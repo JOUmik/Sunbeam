@@ -3,9 +3,6 @@
 
 #include "Singleton/BeamAssetManager.h"
 
-#include "Singleton/BeamGameplayTags.h"
-
-
 UBeamAssetManager& UBeamAssetManager::Get()
 {
 	check(GEngine);
@@ -16,6 +13,4 @@ UBeamAssetManager& UBeamAssetManager::Get()
 void UBeamAssetManager::StartInitialLoading()
 {
 	Super::StartInitialLoading();
-
-	FBeamGameplayTags::InitializeGameplayTags();
 }

@@ -3,25 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
+#include "NativeGameplayTags.h"
 
-/**
- * 
- */
-struct FBeamGameplayTags
+namespace SunbeamGameplayTags
 {
-	static const FBeamGameplayTags& Get()
-	{
-		return GameplayTags;
-	}
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(LightSourceBase);
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(LightSource_Sun);
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(LightSource_Moon);
 
-	static void InitializeGameplayTags();
-
-	FGameplayTag LightSource_Sun;
-	FGameplayTag LightSource_Moon;
-	
-	FGameplayTag SecondarySource_Sunflower;
-    
-private:
-    static FBeamGameplayTags GameplayTags;
-};
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SecondarySourceBase);
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SecondarySource_DayLamp);
+	SUNBEAM_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SecondarySource_NightLamp);
+}

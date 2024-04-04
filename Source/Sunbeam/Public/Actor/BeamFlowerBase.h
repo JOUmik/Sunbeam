@@ -18,14 +18,14 @@ class SUNBEAM_API ABeamFlowerBase : public AActor, public IInteractable, public 
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	ABeamFlowerBase();
 
 	/* IInteractable interface */
-	virtual void GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
 	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
+	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
 	/* End IInteractable interface */
 
 	/* IEnergyStorage interface */
@@ -56,10 +56,10 @@ protected:
 	void SetBloomStatus(bool bBloomed);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
-	int32 EnergyValue = 10;
-
+	FGameplayTagContainer InteractableResponseTags;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Flower")
-	FGameplayTagContainer InteractableTags;
+	int32 EnergyValue = 10;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Flower")
 	TObjectPtr<UBeamEnergyStorageComponent> BeamEnergyStorageComponent;
@@ -73,8 +73,7 @@ private:
 	bool CanInteractWithBeam() const;
 	
 	bool bHasBloomed = false;
-	bool bLastBloomStatus = false;
 	bool bIsChangingStatus = false;
-
+	
 	FGameplayTag CurInteractingBeamSourceTag;
 };

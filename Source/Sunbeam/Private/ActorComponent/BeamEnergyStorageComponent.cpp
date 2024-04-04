@@ -20,7 +20,7 @@ bool UBeamEnergyStorageComponent::ConsumeEnergy(int32 EnergyToConsume, const FGa
 
 	CurEnergy -= EnergyToConsume;
 	CurrentEnergyPerTag.Add(EnergyTypeTag, CurEnergy);
-	OnBeamEnergyChangedDelegate.Broadcast(CurEnergy);
+	OnBeamEnergyChangedDelegate.Broadcast(CurEnergy, EnergyTypeTag);
 	
 	return true;
 }
@@ -40,24 +40,9 @@ bool UBeamEnergyStorageComponent::AddEnergy(int32 EnergyToAdd, const FGameplayTa
 
 	CurEnergy += EnergyToAdd;
 	CurrentEnergyPerTag.Add(EnergyTypeTag, CurEnergy);
-	OnBeamEnergyChangedDelegate.Broadcast(CurEnergy);
+	OnBeamEnergyChangedDelegate.Broadcast(CurEnergy, EnergyTypeTag);
 	
 	return true;
-}
-
-int32 UBeamEnergyStorageComponent::GetCurEnergy(const FGameplayTag EnergyTypeTag) const
-{
-	if (!CurrentEnergyPerTag.Contains(EnergyTypeTag))
-	{
-		return 0;
-	}
-	
-	return CurrentEnergyPerTag.FindChecked(EnergyTypeTag);
-}
-
-int32 UBeamEnergyStorageComponent::GetMaxEnergy() const
-{
-	return MaxEnergy;
 }
 
 // Called when the game starts

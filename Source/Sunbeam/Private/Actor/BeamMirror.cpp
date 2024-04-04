@@ -64,9 +64,9 @@ void ABeamMirror::OnTickInteract_Implementation(const FHitResult LightHitResult,
 	UpdateBeamActorByHitData();
 }
 
-void ABeamMirror::GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer)
+void ABeamMirror::GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer)
 {
-	OutTagContainer = InteractableTags;
+	OutTagContainer = InteractableResponseTags;
 }
 
 ABeamActor* ABeamMirror::SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag)

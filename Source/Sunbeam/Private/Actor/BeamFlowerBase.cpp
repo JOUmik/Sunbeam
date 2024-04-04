@@ -23,16 +23,24 @@ ABeamFlowerBase::ABeamFlowerBase()
 	SetRootComponent(SphereComponent);
 }
 
-void ABeamFlowerBase::GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer)
+void ABeamFlowerBase::GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer)
 {
-	OutTagContainer = InteractableTags;
+	OutTagContainer = InteractableResponseTags;
 }
 
 void ABeamFlowerBase::OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource)
 {
-	if (!LightSource->GetClass()->ImplementsInterface(ULightSource::StaticClass())) return;
+	if (!LightSource->GetClass()->ImplementsInterface(ULightSource::StaticClass()))
+	{
+		return;
+	}
+	
 	CurInteractingBeamSourceTag = ILightSource::Execute_GetLightSourceTag(LightSource);
-	if (!CanInteractWithBeam()) return;
+	if (!CanInteractWithBeam())
+	{
+		return;
+	}
+	
 	bIsChangingStatus = true;
 	bHasBloomed ? PlayBloomAnimReverse() : PlayBloomAnimForward();
 }
@@ -43,6 +51,7 @@ void ABeamFlowerBase::OnEndInteract_Implementation()
 	{
 		return;
 	}
+	
 	bHasBloomed ? PlayBloomAnimForward() : PlayBloomAnimReverse();
 }
 
@@ -55,17 +64,15 @@ void ABeamFlowerBase::BeginPlay()
 // When the bloom animation reaches the end, the flower is in bloom. When the bloom animation was played in reverse and reaches the start, the flower is not in bloom.
 void ABeamFlowerBase::SetBloomStatus(const bool bBloomed)
 {
-	bHasBloomed = bBloomed;
-	bIsChangingStatus = false;
-
-	if (bHasBloomed == bLastBloomStatus)
+	if (bBloomed == bHasBloomed)
 	{
 		return;
 	}
-	bLastBloomStatus = bHasBloomed;
+	
+	bHasBloomed = bBloomed;
+	bIsChangingStatus = false;
 
 	const ABeamPawn* BeamPawn = Cast<ABeamPawn>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
-
 	if (!IsValid(BeamPawn))
 	{
 		return;
@@ -91,7 +98,7 @@ bool ABeamFlowerBase::ConsumeEnergyFromPlayer() const
 	bool bSuccess = PlayerEnergyStorageComponent->ConsumeEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), CurInteractingBeamSourceTag);
 
 	// For flowers, energy is not stored per tag, so we need to add energy for all interactable tags the flower has
-	for (auto& InteractableTag : InteractableTags)
+	for (auto& InteractableTag : InteractableResponseTags)
 	{
 		bSuccess &= BeamEnergyStorageComponent->AddEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), InteractableTag);
 	}
@@ -111,7 +118,7 @@ bool ABeamFlowerBase::AddEnergyToPlayer() const
 	bool bSuccess = PlayerEnergyStorageComponent->AddEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), CurInteractingBeamSourceTag);
 
 	// For flowers, energy is not stored per tag, so we need to consume energy for all interactable tags the flower has
-	for (auto& InteractableTag : InteractableTags)
+	for (auto& InteractableTag : InteractableResponseTags)
 	{
 		bSuccess &= BeamEnergyStorageComponent->ConsumeEnergy(BeamEnergyStorageComponent->GetMaxEnergy(), InteractableTag);
 	}
@@ -140,4 +147,3 @@ bool ABeamFlowerBase::CanInteractWithBeam() const
 		return BeamEnergyStorageComponent->GetCurEnergy(CurInteractingBeamSourceTag) < BeamEnergyStorageComponent->GetMaxEnergy() && PlayerEnergyStorageComponent->GetCurEnergy(CurInteractingBeamSourceTag) >= BeamEnergyStorageComponent->GetMaxEnergy();
 	}
 }
-
