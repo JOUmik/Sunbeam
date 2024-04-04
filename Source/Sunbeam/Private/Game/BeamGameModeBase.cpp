@@ -102,6 +102,15 @@ void ABeamGameModeBase::ShowInteractableByType(const FGameplayTag& InteractableT
 		for (AActor* Interactable : InteractableArray.Value)
 		{
 			Interactable->SetActorHiddenInGame(true);
+
+			// Propagate to children
+			TArray<AActor*> AttachedChildren;
+			Interactable->GetAttachedActors(AttachedChildren);
+			for (AActor* Child : AttachedChildren)
+			{
+				Child->SetActorHiddenInGame(true);
+			}
+			
 		}
 	}
 
@@ -111,6 +120,14 @@ void ABeamGameModeBase::ShowInteractableByType(const FGameplayTag& InteractableT
 		for (AActor* Interactable : *InteractableArray)
 		{
 			Interactable->SetActorHiddenInGame(false);
+
+			// Propagate to children
+			TArray<AActor*> AttachedChildren;
+			Interactable->GetAttachedActors(AttachedChildren);
+			for (AActor* Child : AttachedChildren)
+			{
+				Child->SetActorHiddenInGame(false);
+			}
 		}
 	}
 }
