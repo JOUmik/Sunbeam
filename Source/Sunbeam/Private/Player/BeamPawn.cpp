@@ -79,24 +79,17 @@ ABeamActor* ABeamPawn::GetOwningBeamActor_Implementation()
 
 void ABeamPawn::RotateBeamPawn_MouseInput(FVector2D RotateAxisVector)
 {
-	// Convert the current actor rotation to a quaternion
-	const FQuat CurrentQuat = GetActorQuat();
+	// Get the current rotation of the actor
+	const FQuat CurrentRotation = GetActorQuat();
 
-	// Create a quaternion for the yaw rotation around the global Z axis (up vector)
-	const FQuat YawQuat = FQuat(FVector::UpVector, FMath::DegreesToRadians(RotateAxisVector.X));
+	// Calculate the new rotation based on the mouse input
+	FQuat DeltaRotation(FVector::RightVector, FMath::DegreesToRadians(-RotateAxisVector.Y));
+	DeltaRotation *= FQuat(FVector::UpVector, FMath::DegreesToRadians(RotateAxisVector.X));
 
-	// Create a quaternion for the pitch rotation around the global X axis (right vector)
-	const FQuat PitchQuat = FQuat(FVector::RightVector, FMath::DegreesToRadians(-RotateAxisVector.Y));
-
-	// Apply the rotations additively by multiplying the quaternions with the current rotation quaternion
-	FQuat NewQuat = YawQuat * PitchQuat * CurrentQuat;
-
-	// Normalize the resulting quaternion to ensure it represents a valid rotation
-	NewQuat.Normalize();
-
-	// Update the actor's rotation with the new quaternion
-	SetActorRotation(NewQuat);
+	// Set the new rotation to the actor
+	SetActorRotation(CurrentRotation * DeltaRotation);
 }
+
 
 void ABeamPawn::RotateBeamPawn_ControllerInput(FVector2D RotateAxisVector)
 {
