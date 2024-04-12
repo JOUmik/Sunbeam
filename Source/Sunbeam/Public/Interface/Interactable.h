@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "LightSource.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
@@ -23,14 +24,14 @@ class SUNBEAM_API IInteractable
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void OnBeginInteract(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag);
+	void OnBeginInteract(FHitResult LightHitResult, AActor* LightSource);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
 	void OnEndInteract();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void OnTickInteract(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag, float DeltaTime);
+	void OnTickInteract(FHitResult LightHitResult, AActor* LightSource, float DeltaTime);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactable")
-	void GetInteractableTags(FGameplayTagContainer& OutTagContainer);
+	void GetInteractableResponseTags(FGameplayTagContainer& OutTagContainer);
 };

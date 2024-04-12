@@ -5,7 +5,11 @@
 
 #include "NiagaraComponent.h"
 #include "Sunbeam.h"
+#include "ActorComponent/BeamEnergyStorageComponent.h"
+#include "Game/BeamGameModeBase.h"
+#include "Interface/BeamSpawner.h"
 #include "Interface/Interactable.h"
+#include "Player/BeamPawn.h"
 
 namespace SunBeamConsoleVariables
 {
@@ -68,7 +72,7 @@ void ABeamActor::Tick(float DeltaSeconds)
 		}
 #endif // ENABLE_DRAW_DEBUG
 		
-		if (CanInteractWithActor(HitResult.GetActor()))
+		if (CanInteractWithActor_Implementation(HitResult.GetActor()))
 		{
 			CurBeamHitInteractables.Add(HitResult.GetActor());
 			CurBeamHitData.Add(HitResult.GetActor(), HitResult);
@@ -87,13 +91,13 @@ void ABeamActor::Tick(float DeltaSeconds)
 	for (AActor* NewActor : NewActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[NewActor];
-		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, BeamSourceTag);
+		IInteractable::Execute_OnBeginInteract(NewActor, CurBeamHitResult, this);
 	}
 
 	for (AActor* OldActor : OldActors)
 	{
 		FHitResult CurBeamHitResult = CurBeamHitData[OldActor];
-		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, BeamSourceTag, DeltaSeconds);
+		IInteractable::Execute_OnTickInteract(OldActor, CurBeamHitResult, this, DeltaSeconds);
 	}
 
 	LastBeamHitInteractables = CurBeamHitInteractables;
@@ -109,45 +113,41 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 	CollisionParams.AddIgnoredActor(GetBeamOwner());
 	CollisionParams.bTraceComplex = true;
 	
-	bool bHit = false;
+	bool bHit;
 	if (SweepRadius > 0.0f)
 	{
-
-#if ENABLE_DRAW_DEBUG
-		if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
-		{
-			FVector SweepDirection = (TraceEndLocation - TraceStartLocation).GetSafeNormal();
-			float CapsuleLength = (TraceEndLocation - TraceStartLocation).Size() + 2 * SweepRadius; // Add diameter to cover both ends
-			FQuat CapsuleRotation = FRotationMatrix::MakeFromZ(SweepDirection).ToQuat();
-			DrawDebugCapsule(GetWorld(), TraceStartLocation + SweepDirection * (CapsuleLength * 0.5f - SweepRadius), CapsuleLength * 0.5f, SweepRadius, CapsuleRotation, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
-		}
-#endif // ENABLE_DRAW_DEBUG
-
 		bHit = GetWorld()->SweepMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, FQuat::Identity, ECC_Light, FCollisionShape::MakeSphere(SweepRadius), CollisionParams);
-		if (bHit)
-		{
-			TraceEndLocation = OutHits.Last().ImpactPoint;
-		}
 	}
 	else
 	{
-		
+		bHit = GetWorld()->LineTraceMultiByChannel(OutHits, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
+	}
+
+	if (OutHits.Num() > 0)
+	{
+		TraceEndLocation = OutHits.Last().ImpactPoint;
+	}
+
 #if ENABLE_DRAW_DEBUG
-		if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
+	if (SunBeamConsoleVariables::DrawBeamTracesDuration > 0.0f)
+	{
+		if (SweepRadius > 0.0f)
+		{
+			const FVector SweepDirection = (TraceEndLocation - TraceStartLocation).GetSafeNormal();
+			const float CapsuleLength = (TraceEndLocation - TraceStartLocation).Size() + 2 * SweepRadius; // Add diameter to cover both ends
+			const FQuat CapsuleRotation = FRotationMatrix::MakeFromZ(SweepDirection).ToQuat();
+			DrawDebugCapsule(GetWorld(), TraceStartLocation + SweepDirection * (CapsuleLength * 0.5f - SweepRadius), CapsuleLength * 0.5f, SweepRadius, CapsuleRotation, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
+		}
+		else
 		{
 			static float DebugThickness = 1.0f;
 			DrawDebugLine(GetWorld(), TraceStartLocation, TraceEndLocation, FColor::Green, false, SunBeamConsoleVariables::DrawBeamTracesDuration, 0, DebugThickness);
 		}
-#endif // ENABLE_DRAW_DEBUG
-		
-		FHitResult SingleHit;
-		bHit = GetWorld()->LineTraceSingleByChannel(SingleHit, TraceStartLocation, TraceEndLocation, ECC_Light, CollisionParams);
-		if (bHit)
-		{
-			OutHits.Add(SingleHit);
-			TraceEndLocation = SingleHit.ImpactPoint;
-		}
+
+		static float DebugPointSize = 5.0f;
+		DrawDebugPoint(GetWorld(), TraceEndLocation, DebugPointSize, FColor::Blue, false, SunBeamConsoleVariables::DrawBeamTracesDuration);
 	}
+#endif // ENABLE_DRAW_DEBUG
 
 	SetBeamEndLocation(TraceEndLocation);
 	return bHit;
@@ -156,34 +156,69 @@ bool ABeamActor::RayTraceBeam(TArray<FHitResult>& OutHits) const
 void ABeamActor::SetBeamEndLocation(const FVector& EndLocation) const
 {
 	BeamEffectComponent->SetVariableVec3(FName("Beam_end"), EndLocation);
-	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(0.5f, 0.5f, 10.0f));
-}
+	const float ZSize = FVector::Distance(GetActorLocation(), EndLocation) * 0.0051;
+	BeamEffectComponent->SetVariableVec3(FName("BeamScale"), FVector(1, 1, ZSize));
 
-AActor* ABeamActor::GetBeamOwner() const
-{
-	return BeamOwner;
+	// TODO: Temp: Set player beam end pos to material collection
+	if (Cast<ABeamPawn>(GetBeamOwner()))
+	{
+		const ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+		check(BeamGameMode);
+		BeamGameMode->SetMaterialVectorParameter(FName("LightPos"), FLinearColor(EndLocation));
+	}
 }
 
 void ABeamActor::SetBeamOwner(AActor* InBeamOwner)
 {
+	// check if the beam owner is valid and implements the IBeamSpawner interface
+	check(InBeamOwner);
+	check(InBeamOwner->GetClass()->ImplementsInterface(UBeamSpawner::StaticClass()));
 	BeamOwner = InBeamOwner;
 }
 
-bool ABeamActor::CanInteractWithActor(AActor* OtherActor) const
+void ABeamActor::SetBeamSourceTag(const FGameplayTag& InBeamSourceTag)
 {
-	if (!IsValid(OtherActor))
+	LightSourceTag = InBeamSourceTag;
+}
+
+void ABeamActor::SetBeamActiveStatus(const bool bIsActive)
+{
+	SetActorTickEnabled(bIsActive);
+	SetActorHiddenInGame(not bIsActive);
+
+	if (not bIsActive)
 	{
-		return false;
+		for (AActor* LastBeamHitInteractable : LastBeamHitInteractables)
+		{
+			IInteractable::Execute_OnEndInteract(LastBeamHitInteractable);
+		}
+
+		LastBeamHitInteractables.Empty();
 	}
-	
-	if(!OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
+
+	// Get current game mode
+	ABeamGameModeBase* BeamGameMode = GetWorld()->GetAuthGameMode<ABeamGameModeBase>();
+	check(BeamGameMode);
+
+	BeamGameMode->AddBeamCount(bIsActive ? 1 : -1);
+}
+
+FGameplayTag ABeamActor::GetLightSourceTag_Implementation() const
+{
+	return LightSourceTag;
+}
+
+bool ABeamActor::CanInteractWithActor_Implementation(AActor* OtherActor) const
+{
+	if (!IsValid(OtherActor) or !OtherActor->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
 		return false;
 	}
 
 	// Check if the beam source tag is in the interactable tags
+	check(LightSourceTag != FGameplayTag::EmptyTag);
 	const IInteractable* Interactable = Cast<IInteractable>(OtherActor);
 	FGameplayTagContainer InteractableTags;
-	Interactable->Execute_GetInteractableTags(OtherActor, InteractableTags);
-	return InteractableTags.HasTag(BeamSourceTag);
+	IInteractable::Execute_GetInteractableResponseTags(OtherActor, InteractableTags);
+	return InteractableTags.HasTag(LightSourceTag);
 }

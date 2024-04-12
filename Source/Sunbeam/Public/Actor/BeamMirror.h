@@ -18,19 +18,22 @@ public:
 	ABeamMirror();
 
 	/* IInteractable interface */
-	virtual void OnBeginInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag) override;
+	virtual void OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource) override;
 	virtual void OnEndInteract_Implementation() override;
-	virtual void OnTickInteract_Implementation(FHitResult BeamHitResult, FGameplayTag BeamLightSourceTag, float DeltaTime) override;
-	virtual void GetInteractableTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
+	virtual void OnTickInteract_Implementation(FHitResult LightHitResult, AActor* LightSource, float DeltaTime) override;
+	virtual void GetInteractableResponseTags_Implementation(FGameplayTagContainer& OutTagContainer) override;
 	/* End IInteractable interface */
 
 	/* IBeamSpawner interface */
-	virtual void SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass) override;
-	virtual ABeamActor* GetSpawnedBeamActor_Implementation() override;
+	virtual ABeamActor* SpawnBeamActor_Implementation(TSubclassOf<ABeamActor> BeamActorClass, FGameplayTag& BeamSourceTag) override;
+	virtual ABeamActor* GetOwningBeamActor_Implementation() override;
 	/* End IBeamSpawner interface */
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	FGameplayTagContainer InteractableTags;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam Interaction")
+	FGameplayTagContainer InteractableResponseTags;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam Interaction")
+	FGameplayTag InteractableAssetTag;
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,17 +42,11 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Beam")
-	TSubclassOf<ABeamActor> DefaultBeamActorClass;
-
-	
-
 private:
 	void UpdateBeamActorByHitData() const;
-
-	TObjectPtr<ABeamActor> BeamActor;
-
-	FHitResult CurBeamHitData; // TODO: Replace with custom struct that only contains the necessary data
+	
+	TObjectPtr<ABeamActor> SpawnedBeamActor;
+	FHitResult CurBeamHitData;
 
 	bool bIsBeingHit = false;
 };
