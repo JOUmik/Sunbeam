@@ -24,13 +24,13 @@ void ABeamPlayerController::SetupInputComponent()
 
 	EnhancedInputComponent->BindAction(RotateWithMouseInputAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeamWithMouseInput);
 	EnhancedInputComponent->BindAction(RotateWithJoystickAction, ETriggerEvent::Triggered, this, &ABeamPlayerController::RotateBeamWithJoystick);
-	EnhancedInputComponent->BindAction(SwitchBeamStateAction, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState);
+	EnhancedInputComponent->BindAction(SwitchBeamState1Action, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState, 0);
+	EnhancedInputComponent->BindAction(SwitchBeamState2Action, ETriggerEvent::Completed, this, &ABeamPlayerController::SwitchBeamState, 1);
 	EnhancedInputComponent->BindAction(SwitchAction, ETriggerEvent::Started, this, &ABeamPlayerController::SwitchControlMethod);
 	EnhancedInputComponent->BindAction(ChangeMapAction, ETriggerEvent::Started, this, &ABeamPlayerController::ChangeMapWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMirrorAction, ETriggerEvent::Started, this, &ABeamPlayerController::ShowMirrorWithEnhancedInput);
 	EnhancedInputComponent->BindAction(ChangeMirrorAction, ETriggerEvent::Completed, this, &ABeamPlayerController::HideMirrorWithEnhancedInput);
 	EnhancedInputComponent->BindAction(RotateLevelAction, ETriggerEvent::Started, this, &ABeamPlayerController::RotateLevelWithEnhancedInput);
-
 }
 
 void ABeamPlayerController::BeginPlay()
@@ -90,11 +90,11 @@ void ABeamPlayerController::RotateBeamWithJoystick(const FInputActionValue& Inpu
 	}
 }
 
-void ABeamPlayerController::SwitchBeamState()
+void ABeamPlayerController::SwitchBeamState(int32 index)
 {
 	if (ABeamPawn* BeamPawn = Cast<ABeamPawn>(GetPawn()))
 	{
-		BeamPawn->SwitchToNextBeamState();
+		BeamPawn->SwitchToNextBeamState(index);
 	}
 }
 
@@ -173,10 +173,9 @@ void ABeamPlayerController::RotateLevelWithHardware(int index)
 
 void ABeamPlayerController::ChangeMap(int index)
 {
-	if (UGameInstance* GameIns = GetGameInstance())
-	{
-		Cast<USunbeamGameInstance>(GameIns)->ChangeMap(index);
-	}
+	check(index >= 0 && index <= LevelToLoad.Num());
+	const FName LevelName = LevelToLoad[index];
+	UGameplayStatics::OpenLevel(GetWorld(), LevelName);
 }
 
 void ABeamPlayerController::RotateLevel(const int input)

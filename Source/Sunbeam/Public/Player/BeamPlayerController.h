@@ -32,6 +32,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ADirectionalLight* ControlledLight;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Level")
+	TArray<FName> LevelToLoad;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeMirror(bool bShow);
 	UFUNCTION(BlueprintImplementableEvent)
@@ -46,11 +49,12 @@ protected:
 	void RotateBeamWithMouseInput(const FInputActionValue& InputActionValue);
 	void RotateBeamWithJoystick(const FInputActionValue& InputActionValue);
 
-	void SwitchBeamState();
+	UFUNCTION(BlueprintCallable)
+	void SwitchBeamState(int32 index);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseHardware = true;
 
@@ -127,5 +131,8 @@ private:
 	USunbeamGameInstance* SunbeamGameInstance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> SwitchBeamStateAction;
+	TObjectPtr<UInputAction> SwitchBeamState1Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SwitchBeamState2Action;
 };
