@@ -42,7 +42,8 @@ public:
 	void RotateBeamPawn_ControllerInput(FVector2D RotateAxisVector);
 
 	// Move to next beam state
-	void SwitchToNextBeamState();
+	UFUNCTION(BlueprintCallable, Category = "Beam")
+	void SwitchToNextBeamState(int32 index);
 	
 	FOnBeamStateChange OnBeamStateChangeDelegate;
 	

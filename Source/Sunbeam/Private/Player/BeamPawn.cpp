@@ -35,7 +35,7 @@ void ABeamPawn::BeginPlay()
 	// Set the default beam actor
 	// After spawning all beam actors, cur beam tag is the last tag in the map
 	// So after switching, cur beam tag will be the first tag in the map
-	SwitchToNextBeamState();
+	SwitchToNextBeamState(0);
 
 	const ABeamPlayerController* BeamPlayerController = Cast<ABeamPlayerController>(GetController());
 	if (ABeamHUD* BeamHUD = Cast<ABeamHUD>(BeamPlayerController->GetHUD()))
@@ -116,14 +116,16 @@ void ABeamPawn::RotateBeamPawn_ControllerInput(FVector2D RotateAxisVector)
 	SetActorRotation(rotator);
 }
 
-void ABeamPawn::SwitchToNextBeamState()
+void ABeamPawn::SwitchToNextBeamState(int32 index)
 {
 	auto It = OwningBeamActors.CreateConstIterator();
 	check(It);
 
+	int32 CurrentIndex = 0;
+
 	while (It)
 	{
-		if (It.Key().MatchesTag(CurBeamTag))
+		if (It.Key().MatchesTag(CurBeamTag) && CurrentIndex != index)
 		{
 			// Disable the current beam actor
 			if (IsValid(CurBeamActor))
@@ -132,6 +134,7 @@ void ABeamPawn::SwitchToNextBeamState()
 			}
 			
 			++It;
+			CurrentIndex++;
 			if (!It)
 			{
 				// Set the next beam actor in map active
@@ -155,6 +158,7 @@ void ABeamPawn::SwitchToNextBeamState()
 		else
 		{
 			++It;
+			CurrentIndex++;
 		}
 	}
 }
