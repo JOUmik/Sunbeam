@@ -6,6 +6,7 @@
 #include "ActorComponent/BeamEnergyStorageComponent.h"
 #include "Beam/BeamActor.h"
 #include "Components/SphereComponent.h"
+#include "Game/BeamGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/BeamPawn.h"
 
@@ -129,6 +130,12 @@ bool ABeamFlowerBase::AddEnergyToPlayer() const
 // Check if the flower can interact with the beam from the energy perspective
 bool ABeamFlowerBase::CanInteractWithBeam() const
 {
+	ABeamGameModeBase* BeamGameMode = Cast<ABeamGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (BeamGameMode->IsObjectiveCompleted())
+	{
+		return false;
+	}
+	
 	const ABeamPawn* PlayerPawn = Cast<ABeamPawn>(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn());
 	const UBeamEnergyStorageComponent* PlayerEnergyStorageComponent = PlayerPawn->GetBeamEnergyStorageComponent();
 	if (!IsValid(PlayerEnergyStorageComponent) || !IsValid(BeamEnergyStorageComponent))

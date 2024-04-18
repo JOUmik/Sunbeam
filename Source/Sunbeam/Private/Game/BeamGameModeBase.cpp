@@ -4,6 +4,8 @@
 #include "Game/BeamGameModeBase.h"
 
 #include "Actor/BeamObjective.h"
+#include "Components/LightComponent.h"
+#include "Engine/DirectionalLight.h"
 #include "Interface/Interactable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialParameterCollection.h"
@@ -142,15 +144,45 @@ int32 ABeamGameModeBase::GetObjectiveCompletedCount() const
 	return ObjectiveCompletedCount;
 }
 
+bool ABeamGameModeBase::IsObjectiveCompleted() const
+{
+	return bIsObjectiveCompleted;
+}
+
 void ABeamGameModeBase::OnObjectiveStateChanged(const bool bNewState)
 {
+	if (bIsObjectiveCompleted)
+	{
+		return;
+	}
+	
 	ObjectiveCompletedCount += bNewState ? 1 : -1;
 	OnObjectiveCompletedCountChangeDelegate.Broadcast(ObjectiveCompletedCount, ObjectiveCount);
 	
 	if (ObjectiveCompletedCount == ObjectiveCount)
 	{
-		// All objectives are completed
-		// TODO: Winning Condition
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("All objectives are completed"));
+		bIsObjectiveCompleted = true;
+
+		TArray<AActor*> OutSunLights;
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), ADirectionalLight::StaticClass(), TEXT("SunLight"), OutSunLights);
+
+		for (AActor* Actor : OutSunLights)
+		{
+			if (ADirectionalLight* DirectionalLight = Cast<ADirectionalLight>(Actor))
+			{
+				DirectionalLight->GetLightComponent()->SetIntensity(SunlightIntensity);
+			}
+		}
+
+		TArray<AActor*> OutMoonLights;
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), ADirectionalLight::StaticClass(), TEXT("MoonLight"), OutMoonLights);
+
+		for (AActor* Actor : OutMoonLights)
+		{
+			if (ADirectionalLight* DirectionalLight = Cast<ADirectionalLight>(Actor))
+			{
+				DirectionalLight->GetLightComponent()->SetIntensity(MoonLightIntensity);
+			}
+		}
 	}
 }
