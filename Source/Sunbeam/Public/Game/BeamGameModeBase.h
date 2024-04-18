@@ -31,9 +31,16 @@ public:
 
 	int32 GetObjectiveCount() const;
 	int32 GetObjectiveCompletedCount() const;
+	bool IsObjectiveCompleted() const;
 
 	UFUNCTION()
 	void OnObjectiveStateChanged(bool bNewState);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Directional Light")
+	float SunlightIntensity = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Directional Light")
+	float MoonLightIntensity = 1.0f;
 
 	FOnObjectiveCompletedCountChanged OnObjectiveCompletedCountChangeDelegate;
 
@@ -43,6 +50,8 @@ private:
 
 	int32 ObjectiveCount;
 	int32 ObjectiveCompletedCount;
+
+	bool bIsObjectiveCompleted = false;
 
 	TMap<FGameplayTag, TArray<AActor*>> InteractableMap;
 };

@@ -3,6 +3,9 @@
 
 #include "Actor/BeamObjective.h"
 
+#include "Game/BeamGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ABeamObjective::ABeamObjective()
 {
@@ -12,6 +15,12 @@ ABeamObjective::ABeamObjective()
 
 void ABeamObjective::OnBeginInteract_Implementation(FHitResult LightHitResult, AActor* LightSource)
 {
+	ABeamGameModeBase* BeamGameMode = Cast<ABeamGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (BeamGameMode->IsObjectiveCompleted())
+	{
+		return;
+	}
+	
 	if (LightSourceCount == 0)
 	{
 		PlayBloomAnimForward();
@@ -21,6 +30,12 @@ void ABeamObjective::OnBeginInteract_Implementation(FHitResult LightHitResult, A
 
 void ABeamObjective::OnEndInteract_Implementation()
 {
+	ABeamGameModeBase* BeamGameMode = Cast<ABeamGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (BeamGameMode->IsObjectiveCompleted())
+	{
+		return;
+	}
+	
 	LightSourceCount--;
 	if (LightSourceCount == 0)
 	{
